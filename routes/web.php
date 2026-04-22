@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProjectController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -23,6 +24,12 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
+    Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+
+    Route::get('/jobs', [ProjectController::class, 'index'])->name('jobs.index');
+    Route::post('/jobs/{project}/take', [ProjectController::class, 'take'])->name('jobs.take');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

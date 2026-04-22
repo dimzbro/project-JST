@@ -161,10 +161,15 @@
                     <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <p class="text-sm text-gray-500 mb-6 flex-1">Butuh bantuan untuk menyelesaikan proyek? Posting lowongan Anda sekarang dan temukan tenaga ahli terbaik.</p>
-                <button class="w-full py-2.5 px-4 rounded-md text-sm font-medium transition-colors
-                    {{ $role === 'client' ? 'bg-[#5bc0de] text-white hover:bg-blue-400' : 'bg-gray-100 text-gray-400 border border-gray-200' }}">
-                    Pasang Sekarang
-                </button>
+                @if($role === 'client')
+                    <a href="{{ route('projects.create') }}" class="w-full text-center py-2.5 px-4 rounded-md text-sm font-medium transition-colors bg-[#5bc0de] text-white hover:bg-blue-400 block">
+                        Pasang Sekarang
+                    </a>
+                @else
+                    <button class="w-full py-2.5 px-4 rounded-md text-sm font-medium transition-colors bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed">
+                        Pasang Sekarang
+                    </button>
+                @endif
             </div>
 
             <!-- Cari Lowongan Kerja Card -->
@@ -174,10 +179,15 @@
                     <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
                 <p class="text-sm text-gray-500 mb-6 flex-1">Butuh bantuan untuk menyelesaikan proyek? Posting lowongan Anda sekarang dan temukan tenaga ahli terbaik.</p>
-                <button class="w-full py-2.5 px-4 rounded-md text-sm font-medium transition-colors border-2
-                    {{ $role === 'worker' ? 'bg-white border-blue-400 text-blue-500 hover:bg-blue-50' : 'bg-gray-100 border-gray-200 text-gray-400' }}">
-                    Cari Lowongan
-                </button>
+                @if($role === 'worker')
+                    <a href="{{ route('jobs.index') }}" class="w-full text-center py-2.5 px-4 rounded-md text-sm font-medium transition-colors border-2 bg-white border-blue-400 text-blue-500 hover:bg-blue-50 block">
+                        Cari Lowongan
+                    </a>
+                @else
+                    <button class="w-full py-2.5 px-4 rounded-md text-sm font-medium transition-colors border-2 bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed">
+                        Cari Lowongan
+                    </button>
+                @endif
             </div>
 
         </div>
