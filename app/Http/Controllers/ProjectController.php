@@ -44,7 +44,7 @@ class ProjectController extends Controller
         ]);
 
         $validated['client_id'] = Auth::id();
-        $validated['status'] = 'active';
+        $validated['status'] = 'pending';
 
         $project = Project::create($validated);
 
@@ -105,5 +105,112 @@ class ProjectController extends Controller
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Pekerjaan berhasil diambil. Silakan cek di menu pekerjaan aktif Anda.');
+    }
+
+    /**
+     * Client manages their jobs.
+     */
+    public function manage()
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya client yang bisa mengelola pekerjaan.');
+        }
+
+        $projects = Project::where('client_id', Auth::id())->latest()->get();
+
+        return view('projects.manage', compact('projects'));
+    }
+    /**
+     * Show the form for editing the specified project.
+     */
+    public function edit(Project $project)
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client' || $project->client_id !== Auth::id()) {
+            return redirect()->route('projects.manage')->with('error', 'Akses ditolak.');
+        }
+
+        if (!in_array($project->status, ['pending', 'rejected'])) {
+            return redirect()->route('projects.manage')->with('error', 'Pekerjaan yang sudah diproses atau disetujui tidak dapat diedit.');
+        }
+
+        return view('projects.edit', compact('project'));
+    }
+
+    /**
+     * Update the specified project in storage.
+     */
+    public function update(Request $request, Project $project)
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client' || $project->client_id !== Auth::id()) {
+            return redirect()->route('projects.manage')->with('error', 'Akses ditolak.');
+        }
+
+        if (!in_array($project->status, ['pending', 'rejected'])) {
+            return redirect()->route('projects.manage')->with('error', 'Pekerjaan yang sudah diproses atau disetujui tidak dapat diedit.');
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'category' => 'nullable|string|max:255',
+            'budget' => 'nullable|numeric|min:0',
+            'description' => 'required|string',
+            'deadline' => 'nullable|date',
+        ]);
+
+        // Reset status to pending so admin can re-verify the edited project
+        $validated['status'] = 'pending';
+
+        $project->update($validated);
+
+        ActivityLog::create([
+            'description' => 'Client ' . Auth::user()->first_name . ' mengedit pekerjaan: ' . $project->title,
+            'type' => 'project'
+        ]);
+
+        return redirect()->route('projects.manage')->with('success', 'Pekerjaan berhasil diperbarui.');
+    }
+
+    /**
+     * Remove the specified project from storage.
+     */
+    public function destroy(Project $project)
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client' || $project->client_id !== Auth::id()) {
+            return redirect()->route('projects.manage')->with('error', 'Akses ditolak.');
+        }
+
+        if (!in_array($project->status, ['pending', 'rejected'])) {
+            return redirect()->route('projects.manage')->with('error', 'Pekerjaan yang sudah diproses atau disetujui tidak dapat dihapus.');
+        }
+
+        $projectTitle = $project->title;
+        $project->delete();
+
+        ActivityLog::create([
+            'description' => 'Client ' . Auth::user()->first_name . ' menghapus pekerjaan: ' . $projectTitle,
+            'type' => 'project'
+        ]);
+
+        return redirect()->route('projects.manage')->with('success', 'Pekerjaan berhasil dihapus.');
+    }
+
+    /**
+     * Display the specified project and its applicants (tasks).
+     */
+    public function show(Project $project)
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client' || $project->client_id !== Auth::id()) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        // Load tasks and the associated workers
+        $project->load('tasks.worker');
+
+        return view('projects.show', compact('project'));
     }
 }

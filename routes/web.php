@@ -27,9 +27,18 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::get('/projects/manage', [ProjectController::class, 'manage'])->name('projects.manage');
+    Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+    Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
+    Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
     Route::get('/jobs', [ProjectController::class, 'index'])->name('jobs.index');
     Route::post('/jobs/{project}/take', [ProjectController::class, 'take'])->name('jobs.take');
+
+    Route::get('/admin/verifikasi', [App\Http\Controllers\AdminVerificationController::class, 'index'])->name('admin.verification.index');
+    Route::get('/admin/verifikasi/{project}', [App\Http\Controllers\AdminVerificationController::class, 'show'])->name('admin.verification.show');
+    Route::post('/admin/verifikasi/{project}', [App\Http\Controllers\AdminVerificationController::class, 'verify'])->name('admin.verification.verify');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

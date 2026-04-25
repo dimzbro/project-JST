@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Project extends Model
 {
     //
-    protected $fillable = ['client_id', 'title', 'description', 'status'];
+    protected $fillable = ['client_id', 'title', 'description', 'status', 'budget', 'category', 'deadline'];
 
     public function client()
     {
