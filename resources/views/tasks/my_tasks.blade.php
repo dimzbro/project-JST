@@ -72,8 +72,25 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
-                            Belum ada pekerjaan yang diambil.
+                        <td class="px-6 py-5">
+                            <div class="text-sm font-medium text-gray-500">Desain Logo Untuk Startup</div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="text-sm text-gray-500">Desain Grafis</div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="text-sm text-gray-500">Rp. 250.000</div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="text-sm text-gray-500">8 Mei 2026</div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="text-sm text-gray-500">3hari</div>
+                        </td>
+                        <td class="px-6 py-5 whitespace-nowrap text-center">
+                            <button type="button" class="inline-flex items-center justify-center px-4 py-1.5 border border-blue-400 text-sm font-medium rounded-md text-blue-500 bg-white hover:bg-blue-50 focus:outline-none transition-colors">
+                                Upload
+                            </button>
                         </td>
                     </tr>
                 @endforelse
