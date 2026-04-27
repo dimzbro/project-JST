@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -30,6 +31,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/jobs', [ProjectController::class, 'index'])->name('jobs.index');
     Route::post('/jobs/{project}/take', [ProjectController::class, 'take'])->name('jobs.take');
+
+    Route::get('/my-tasks', [TaskController::class, 'myTasks'])->name('tasks.my_tasks');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
