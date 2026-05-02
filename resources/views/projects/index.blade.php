@@ -1,62 +1,142 @@
-<x-app-layout>
-    <div class="mb-8">
-        <a href="{{ route('dashboard') }}" class="text-sm text-gray-500 hover:text-blue-500 flex items-center mb-4">
-            Kembali
-        </a>
-        <h2 class="text-3xl font-bold text-gray-800 mb-1">Lowongan Pekerjaan</h2>
-        <p class="text-gray-400 text-sm">Temukan pekerjaan yang sesuai dengan keahlian Anda dan mulai hasilkan uang.</p>
-    </div>
+<x-app-layout :hideSidebar="true">
+    <div class="w-full max-w-full">
 
-    @if(session('error'))
-        <div class="mb-6 p-4 text-red-700 bg-red-100 rounded-lg border border-red-200">
-            {{ session('error') }}
+        <div class="mb-8">
+            <a href="{{ route('dashboard') }}" class="text-[13px] text-gray-700 hover:text-[#5bc0de] mb-4 inline-block font-medium">
+                Kembali
+            </a>
+            
+            <h1 class="text-[28px] md:text-[32px] font-bold text-gray-900 mb-1 leading-tight tracking-tight">Eksplorasi Pekerjaan</h1>
+            <p class="text-[14px] md:text-[15px] text-gray-500">Temukan pekerjaan yang sesuai dengan Anda. Ada lebih dari 5 Ribu pekerjaan aktif hari ini yang siap Anda ambil.</p>
         </div>
-    @endif
 
-    <div class="grid grid-cols-1 gap-6">
-        @forelse($projects as $project)
-            <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-md transition-shadow">
-                <div class="flex-1 mb-4 md:mb-0 pr-0 md:pr-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $project->title }}</h3>
-                    <div class="flex flex-wrap items-center text-sm text-gray-500 mb-3 space-x-4">
-                        @if($project->category)
-                            <span class="bg-blue-50 text-blue-700 border border-blue-200 py-1 px-3 rounded-full text-xs font-medium">{{ $project->category }}</span>
-                        @endif
-                        <span class="flex items-center">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                            {{ $project->client->first_name ?? 'Klien' }} {{ $project->client->last_name ?? '' }}
-                        </span>
-                        @if($project->deadline)
-                            <span class="flex items-center text-red-500 bg-red-50 py-1 px-2 rounded-md">
-                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                Deadline: {{ \Carbon\Carbon::parse($project->deadline)->format('d M Y') }}
-                            </span>
-                        @endif
+        @if(session('error'))
+            <div class="mb-6 w-full p-4 text-red-700 bg-red-100 rounded-lg border border-red-200">
+                {{ session('error') }}
+            </div>
+        @endif
+        @if(session('success'))
+            <div class="mb-6 w-full p-4 text-green-700 bg-green-100 rounded-lg border border-green-200">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <form action="{{ route('jobs.index') }}" method="GET" class="mb-8 w-full">
+            <!-- Search Bar -->
+            <div class="flex flex-col md:flex-row gap-3 mb-4 w-full">
+                <div class="relative flex-1 w-full">
+                    <div id="search-icon-wrapper" class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-opacity duration-200">
+                        <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
                     </div>
-                    <div class="text-gray-600 text-sm whitespace-pre-line">{{ $project->description }}</div>
+                    <input type="text" id="search-input" name="search" value="{{ request('search') }}" class="block w-full pl-11 pr-3 py-3 border border-gray-200 rounded-lg leading-5 bg-white focus:outline-none focus:border-[#5bc0de] focus:ring-1 focus:ring-[#5bc0de] text-[15px] shadow-sm transition-all duration-200" placeholder="">
                 </div>
+                <button type="submit" class="w-full md:w-auto bg-[#5bc0de] hover:bg-[#4eb0ce] text-white font-medium py-3 px-8 rounded-lg transition-colors text-[14px] shadow-sm flex-shrink-0">
+                    Cari Sekarang
+                </button>
+            </div>
+
+            <!-- Categories -->
+            <div class="flex flex-wrap gap-2.5 items-center w-full">
+                <a href="{{ route('jobs.index', ['search' => request('search')]) }}" 
+                   class="px-4 py-2 rounded-full text-[13px] font-semibold transition-colors border {{ !request('category') ? 'bg-white border-gray-300 text-gray-900 shadow-sm' : 'bg-transparent border-transparent text-gray-600 hover:bg-gray-100' }}">
+                    Semua
+                </a>
                 
-                <div class="flex flex-col items-start md:items-end w-full md:w-auto mt-4 md:mt-0 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6 shrink-0">
-                    <div class="text-xs text-gray-500 mb-1 uppercase tracking-wider font-semibold">Anggaran</div>
-                    <div class="text-2xl font-bold text-green-600 mb-4">
-                        Rp {{ number_format($project->budget ?? 0, 0, ',', '.') }}
+                @foreach($categories as $cat)
+                    <a href="{{ route('jobs.index', ['category' => $cat, 'search' => request('search')]) }}" 
+                       class="px-4 py-2 rounded-full text-[13px] font-semibold transition-colors border {{ request('category') == $cat ? 'bg-white border-gray-300 text-gray-900 shadow-sm' : 'bg-transparent border-transparent text-gray-600 hover:bg-gray-100' }}">
+                        {{ $cat }}
+                    </a>
+                @endforeach
+                
+                @if(request('category'))
+                    <input type="hidden" name="category" value="{{ request('category') }}">
+                @endif
+            </div>
+        </form>
+
+        <!-- Grid Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 w-full gap-5">
+            @forelse($projects as $project)
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition flex flex-col h-full w-full">
+                    <div class="flex-1">
+                        <h3 class="text-[16px] font-bold text-gray-900 leading-snug mb-1">{{ $project->title }}</h3>
+                        <p class="text-[13px] text-gray-700 mb-4">{{ $project->category ?? 'Tidak ada kategori' }}</p>
+                        
+                        <p class="text-[13px] text-gray-500 mb-6 line-clamp-3 leading-relaxed">
+                            {{ $project->description }}
+                        </p>
+                        
+                        <div class="space-y-0.5 mb-6">
+                            <p class="text-[14px] font-medium text-gray-900">
+                                Rp. {{ number_format($project->budget ?? 0, 0, '.', '.') }}
+                            </p>
+                            @if($project->deadline)
+                                <p class="text-[13px] text-gray-500">
+                                    Deadline: {{ \Carbon\Carbon::parse($project->deadline)->translatedFormat('d M Y') }}
+                                </p>
+                            @endif
+                        </div>
                     </div>
-                    <form action="{{ route('jobs.take', $project->id) }}" method="POST" class="w-full">
-                        @csrf
-                        <button type="submit" class="w-full md:w-auto bg-[#5bc0de] text-white py-2.5 px-6 rounded-md shadow-sm hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-semibold transition-colors" onclick="return confirm('Apakah Anda yakin ingin mengambil pekerjaan ini? Anda diharapkan untuk menyelesaikannya tepat waktu.')">
-                            Ambil Pekerjaan
-                        </button>
-                    </form>
+                    
+                    <div class="flex justify-between items-end mt-auto">
+                        <span class="text-[12px] italic text-gray-400">Klik untuk detail</span>
+                        <a href="{{ route('worker.jobs.show', $project->id) }}" class="text-[13px] font-medium text-[#5bc0de] hover:text-[#4eb0ce] transition-colors flex items-center bg-transparent border-none cursor-pointer">
+                            Lihat <svg class="w-3.5 h-3.5 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                    </div>
                 </div>
-            </div>
-        @empty
-            <div class="bg-white border border-gray-200 rounded-xl p-12 shadow-sm text-center">
-                <div class="w-16 h-16 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            @empty
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 2xl:col-span-5 bg-white border border-gray-200 rounded-xl p-12 shadow-sm text-center w-full">
+                    <div class="w-16 h-16 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Pekerjaan tidak ditemukan</h3>
+                    <p class="text-gray-500 text-[14px] max-w-md mx-auto">Kami tidak menemukan pekerjaan yang sesuai dengan pencarian Anda. Silakan coba kata kunci atau kategori lain.</p>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Belum ada lowongan pekerjaan</h3>
-                <p class="text-gray-500 text-sm max-w-md mx-auto">Saat ini belum ada klien yang memposting pekerjaan baru. Silakan periksa kembali nanti untuk menemukan peluang menarik.</p>
-            </div>
-        @endforelse
+            @endforelse
+        </div>
     </div>
+
+    <!-- Script for Search Icon Behavior -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const searchIconWrapper = document.getElementById('search-icon-wrapper');
+            let timeoutId;
+
+            function updateIconState() {
+                const hasFocus = document.activeElement === searchInput;
+                const hasText = searchInput.value.trim() !== '';
+
+                clearTimeout(timeoutId);
+
+                if (hasFocus || hasText) {
+                    searchIconWrapper.style.opacity = '0';
+                    timeoutId = setTimeout(() => { 
+                        if (document.activeElement === searchInput || searchInput.value.trim() !== '') {
+                            searchIconWrapper.style.display = 'none'; 
+                        }
+                    }, 200);
+                } else {
+                    searchIconWrapper.style.display = 'flex';
+                    setTimeout(() => { 
+                        searchIconWrapper.style.opacity = '1'; 
+                    }, 10);
+                }
+            }
+
+            if (searchInput) {
+                // Initial state check
+                updateIconState();
+                
+                // Event listeners for input changes, focus, and blur
+                searchInput.addEventListener('input', updateIconState);
+                searchInput.addEventListener('focus', updateIconState);
+                searchInput.addEventListener('blur', updateIconState);
+            }
+        });
+    </script>
 </x-app-layout>

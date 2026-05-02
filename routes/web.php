@@ -34,7 +34,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
     Route::get('/jobs', [ProjectController::class, 'index'])->name('jobs.index');
+    Route::get('/worker/jobs/{project}', [ProjectController::class, 'jobDetail'])->name('worker.jobs.show');
     Route::post('/jobs/{project}/take', [ProjectController::class, 'take'])->name('jobs.take');
+
+    Route::get('/worker/tasks', [\App\Http\Controllers\TaskController::class, 'index'])->name('worker.tasks.index');
 
     Route::get('/admin/verifikasi', [App\Http\Controllers\AdminVerificationController::class, 'index'])->name('admin.verification.index');
     Route::get('/admin/verifikasi/{project}', [App\Http\Controllers\AdminVerificationController::class, 'show'])->name('admin.verification.show');

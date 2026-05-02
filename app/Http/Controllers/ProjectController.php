@@ -60,7 +60,7 @@ class ProjectController extends Controller
     /**
      * Show available active projects for workers.
      */
-    public function index()
+    public function index(Request $request)
     {
         // Only workers should be able to see available jobs
         $role = session()->get('active_role', 'client');
@@ -68,9 +68,53 @@ class ProjectController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya worker yang bisa mencari pekerjaan.');
         }
 
-        $projects = Project::with('client')->where('status', 'active')->latest()->get();
+        $query = Project::with('client')->where('status', 'active');
 
-        return view('projects.index', compact('projects'));
+        // Filter based on search keyword (title or description)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter based on category
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        $projects = $query->latest()->get();
+        
+        // Get all unique categories from active projects
+        $categories = Project::where('status', 'active')
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->pluck('category');
+
+        return view('projects.index', compact('projects', 'categories'));
+    }
+
+    /**
+     * Show detail of an active project for workers.
+     */
+    public function jobDetail(Project $project)
+    {
+        // Only workers should be able to see job details
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'worker') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya worker yang bisa melihat detail pekerjaan.');
+        }
+
+        if ($project->status !== 'active') {
+            return redirect()->route('jobs.index')->with('error', 'Pekerjaan ini sudah tidak tersedia.');
+        }
+
+        // Load client details
+        $project->load('client');
+
+        return view('projects.job-detail', compact('project'));
     }
 
     /**
