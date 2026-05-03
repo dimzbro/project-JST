@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -14,14 +15,14 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
-    
+
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 
@@ -39,6 +40,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/verifikasi', [App\Http\Controllers\AdminVerificationController::class, 'index'])->name('admin.verification.index');
     Route::get('/admin/verifikasi/{project}', [App\Http\Controllers\AdminVerificationController::class, 'show'])->name('admin.verification.show');
     Route::post('/admin/verifikasi/{project}', [App\Http\Controllers\AdminVerificationController::class, 'verify'])->name('admin.verification.verify');
+
+    Route::get('/my-tasks', [TaskController::class, 'myTasks'])->name('tasks.my_tasks');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
