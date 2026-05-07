@@ -1,7 +1,7 @@
 <x-app-layout :hideSidebar="true">
     <div class="w-full pb-4">
         
-        <!-- Header -->
+        
         <div class="mb-2">
             <a href="{{ route('jobs.index') }}" class="text-[13px] text-gray-600 hover:text-[#5bc0de] mb-1 inline-block font-medium">
                 Kembali
@@ -15,12 +15,12 @@
             </div>
         @endif
 
-        <!-- Two-column layout -->
+     
         <div style="display: flex; gap: 16px; align-items: flex-start;">
             
-            <!-- Left Column -->
+            
             <div style="flex: 1; min-width: 0;">
-                <!-- Client Info Card -->
+               
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-3" style="display: flex; justify-content: space-between; align-items: center; padding: 14px;">
                     <div style="display: flex; align-items: center;">
                         <div class="bg-gray-200 rounded-full overflow-hidden flex-shrink-0" style="width: 42px; height: 42px; margin-right: 12px;">
@@ -55,7 +55,7 @@
                     </div>
                 </div>
 
-                <!-- Job Details Card -->
+                
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100" style="padding: 24px;">
                     <h2 class="font-bold text-gray-900" style="font-size: 18px; margin-bottom: 14px;">{{ $project->title }}</h2>
                     
@@ -73,10 +73,10 @@
                 </div>
             </div>
 
-            <!-- Right Column: Budget + Action -->
+            
             <div style="width: 320px; flex-shrink: 0;">
                 
-                <!-- Budget Card -->
+                
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200" style="padding: 14px; margin-bottom: 12px;">
                     <h4 class="text-gray-500" style="font-size: 11px; margin-bottom: 2px;">Anggaran Proyek</h4>
                     <p class="font-bold text-gray-900" style="font-size: 20px; margin-bottom: 8px;">
@@ -107,7 +107,7 @@
                     @endif
                 </div>
 
-                <!-- Action Button (triggers modal) -->
+               
                 <button type="button" onclick="document.getElementById('confirmModal').style.display='flex'" class="bg-[#5bc0de] hover:bg-[#4eb0ce] text-white font-bold shadow transition-colors" style="width: 100%; padding: 12px 16px; border-radius: 12px; font-size: 14px; border: none; cursor: pointer; margin-bottom: 8px;">
                     Ambil Pekerjaan
                 </button>
@@ -121,26 +121,26 @@
         </div>
     </div>
 
-    <!-- Custom Confirmation Modal -->
+   
     <div id="confirmModal" style="display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);">
         <div id="confirmModalContent" style="background: white; border-radius: 20px; padding: 32px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.15); animation: modalIn 0.3s ease;">
             
-            <!-- Icon -->
+            
             <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #e0f4fb, #b8e8f7); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                 <svg style="width: 32px; height: 32px; color: #3ba8c9;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </div>
 
-            <!-- Title -->
+            
             <h3 style="font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;">Konfirmasi</h3>
             
-            <!-- Message -->
+           
             <p style="font-size: 14px; color: #6b7280; margin-bottom: 28px; line-height: 1.5;">
                 Apakah Anda yakin ingin mengambil pekerjaan ini?
             </p>
 
-            <!-- Buttons -->
+           
             <div style="display: flex; gap: 12px; justify-content: center;">
                 <button type="button" onclick="document.getElementById('confirmModal').style.display='none'" style="flex: 1; padding: 12px 20px; border-radius: 12px; border: 1px solid #e5e7eb; background: white; color: #374151; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
                     Batal
