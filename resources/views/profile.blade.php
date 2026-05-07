@@ -13,7 +13,7 @@
     <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
         @csrf
 
-        <!-- Top Profile Card -->
+      
         <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm mb-6 flex items-center">
             
             <div class="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 overflow-hidden flex items-center justify-center mr-5 flex-shrink-0 relative group">
@@ -22,7 +22,7 @@
                 @else
                     <svg class="w-10 h-10 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 @endif
-                <!-- Overlay to hint photo upload -->
+                
                 <label for="profile_photo" class="absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </label>
@@ -42,7 +42,7 @@
             </div>
         </div>
 
-        <!-- Detail Form Card -->
+        
         <div class="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
             <h3 class="text-lg font-bold text-gray-800 mb-1">Informasi Dasar</h3>
             <p class="text-sm text-gray-500 mb-6">Detail utama akun anda yang akan terlihat oleh klien.</p>
@@ -126,7 +126,7 @@
     </form>
     
     <script>
-        // Update styling automatically if a photo is selected
+        
         document.getElementById('profile_photo').addEventListener('change', function(e) {
             if (e.target.files && e.target.files[0]) {
                 const reader = new FileReader();
@@ -135,7 +135,7 @@
                     if (img) {
                         img.src = e.target.result;
                     } else {
-                        // Create img element if it doesn't exist
+                        
                         const container = document.querySelector('.w-16.h-16');
                         const svg = container.querySelector('svg');
                         if (svg) svg.remove();

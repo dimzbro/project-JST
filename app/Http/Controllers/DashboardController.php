@@ -18,7 +18,7 @@ class DashboardController extends Controller
         $postedJobsCount = 0;
         $completedJobsCount = 0;
 
-        // Admin stats
+       
         $totalUsers = 0;
         $adminActiveJobs = 0;
         $adminCompletedTasks = 0;
@@ -27,10 +27,10 @@ class DashboardController extends Controller
 
         if ($role === 'client') {
             $postedJobsCount = Project::where('client_id', $user->id)->count();
-            // Client's completed jobs are projects they posted that are marked as completed
+            
             $completedJobsCount = Project::where('client_id', $user->id)->where('status', 'completed')->count();
         } else if ($role === 'worker') {
-            // Worker's active jobs are tasks they are currently working on
+            
             $activeJobsCount = Task::where('worker_id', $user->id)->where('status', 'in_progress')->count();
             $completedJobsCount = Task::where('worker_id', $user->id)->where('status', 'completed')->count();
         } else if ($role === 'admin') {

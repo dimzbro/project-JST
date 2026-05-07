@@ -10,7 +10,7 @@
     </head>
     <body class="font-sans antialiased bg-white text-gray-900 flex h-screen overflow-hidden">
         
-        <!-- Sidebar -->
+        
         <aside class="w-64 bg-[#f4f8fe] flex-shrink-0 h-full border-r border-gray-100 flex flex-col">
             <div class="p-6 flex items-center">
                 <div class="w-10 h-10 bg-blue-200 text-blue-600 font-bold text-xl flex items-center justify-center italic mr-3" style="font-family: serif;">JST</div>

@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
+    
     use HasFactory, Notifiable;
 
     /**
@@ -32,11 +32,7 @@ class User extends Authenticatable
         'rating_count',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+   
     protected $hidden = [
         'password',
         'remember_token',
@@ -52,7 +48,7 @@ class User extends Authenticatable
 
     public function addRating($score)
     {
-        // Score between 1 and 10
+        
         if ($score >= 1 && $score <= 10) {
             $this->rating_points += $score;
             $this->rating_count += 1;
@@ -60,11 +56,7 @@ class User extends Authenticatable
         }
     }
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+   
     protected function casts(): array
     {
         return [

@@ -1,14 +1,14 @@
 <x-app-layout>
     @if($role === 'admin')
-        <!-- Admin Dashboard -->
+        
         <div class="mb-8">
             <h2 class="text-3xl font-bold text-gray-800 mb-1">Admin Dashboard</h2>
             <p class="text-gray-500 text-sm">Selamat datang kembali, berikut adalah ringkasan performa platform hari ini.</p>
         </div>
 
-        <!-- 4 Stats Cards -->
+        
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <!-- Total Pengguna -->
+            
             <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                 <div class="flex justify-between items-start mb-4">
                     <div class="w-10 h-10 bg-blue-100 text-blue-500 rounded-lg flex items-center justify-center">
@@ -19,7 +19,7 @@
                 <span class="text-2xl font-bold text-gray-800">{{ number_format($totalUsers, 0, ',', '.') }}</span>
             </div>
 
-            <!-- Lowongan Aktif -->
+            
             <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                 <div class="flex justify-between items-start mb-4">
                     <div class="w-10 h-10 bg-orange-100 text-orange-500 rounded-lg flex items-center justify-center">
@@ -30,7 +30,7 @@
                 <span class="text-2xl font-bold text-gray-800">{{ number_format($adminActiveJobs, 0, ',', '.') }}</span>
             </div>
 
-            <!-- Tugas Selesai -->
+            
             <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                 <div class="flex justify-between items-start mb-4">
                     <div class="w-10 h-10 bg-green-100 text-green-500 rounded-lg flex items-center justify-center">
@@ -41,7 +41,7 @@
                 <span class="text-2xl font-bold text-gray-800">{{ number_format($adminCompletedTasks, 0, ',', '.') }}</span>
             </div>
 
-            <!-- Total Transaksi -->
+            
             <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                 <div class="flex justify-between items-start mb-4">
                     <div class="w-10 h-10 bg-purple-100 text-purple-500 rounded-lg flex items-center justify-center">
@@ -59,9 +59,9 @@
                     <h3 class="text-lg font-bold text-gray-800">Tren Pertumbuhan Platform</h3>
                     <p class="text-xs text-gray-500">Statistik pendaftaran pengguna dan postingan baru</p>
                 </div>
-                <!-- Mock Chart Area -->
+                
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-80 relative overflow-hidden flex items-end justify-center">
-                    <!-- Very basic mock chart implementation using SVG purely for visual -->
+                    
                     <svg class="w-full h-48 absolute bottom-6 left-0 right-0" preserveAspectRatio="none" viewBox="0 0 100 100">
                         <path d="M0,80 Q10,70 20,80 T40,60 T60,70 T80,50 T100,20 L100,100 L0,100 Z" fill="rgba(59, 130, 246, 0.1)" />
                         <path d="M0,80 Q10,70 20,80 T40,60 T60,70 T80,50 T100,20" fill="none" stroke="#3b82f6" stroke-width="2" />
@@ -106,15 +106,15 @@
             </div>
         </div>
     @else
-        <!-- Welcome Banner -->
+        
         <div class="mb-8 w-full bg-[#007bff] rounded-lg p-6 text-white shadow-sm">
             <h2 class="text-2xl font-bold mb-1">Selamat Datang {{ $user->first_name }} {{ $user->last_name }}!</h2>
             <p class="text-blue-100 text-sm">Berikut adalah ringkasan aktivitas Anda hari ini.</p>
         </div>
 
-        <!-- Stats row -->
+       
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <!-- Pekerjaan Aktif -->
+            
             <div class="bg-white border text-center border-gray-200 rounded-lg p-6 shadow-sm flex flex-col justify-center items-start">
                 <div class="flex items-center mb-2">
                     <div class="w-12 h-12 bg-blue-100 text-blue-500 rounded-lg flex items-center justify-center mr-4">
@@ -126,7 +126,7 @@
                 <p class="text-xs text-gray-500">Tugas yang sedang Anda kerjakan</p>
             </div>
 
-            <!-- Pekerjaan Terpasang -->
+            
             <div class="bg-white border text-center border-gray-200 rounded-lg p-6 shadow-sm flex flex-col justify-center items-start">
                 <div class="flex items-center mb-2">
                     <div class="w-12 h-12 bg-yellow-100 text-yellow-500 rounded-lg flex items-center justify-center mr-4">
@@ -138,7 +138,7 @@
                 <p class="text-xs text-gray-500">Pekerjaan yang anda posting</p>
             </div>
 
-            <!-- Pekerjaan Selesai -->
+            
             <div class="bg-white border text-center border-gray-200 rounded-lg p-6 shadow-sm flex flex-col justify-center items-start">
                 <div class="flex items-center mb-2">
                     <div class="w-12 h-12 bg-green-100 text-green-500 rounded-lg flex items-center justify-center mr-4">
@@ -151,10 +151,10 @@
             </div>
         </div>
 
-        <!-- Actions Row -->
+       
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            <!-- Pasang Lowongan Baru Card -->
+           
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col {{ $role === 'worker' ? 'opacity-50 pointer-events-none' : '' }}">
                 <div class="flex items-center mb-3 text-gray-800">
                     <h3 class="text-lg font-bold mr-2">Pasang Lowongan Baru</h3>
@@ -172,7 +172,7 @@
                 @endif
             </div>
 
-            <!-- Cari Lowongan Kerja Card -->
+           
             <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col {{ $role === 'client' ? 'opacity-50 pointer-events-none' : '' }}">
                 <div class="flex items-center mb-3 text-gray-800">
                     <h3 class="text-lg font-bold mr-2">Cari Lowongan Kerja</h3>
