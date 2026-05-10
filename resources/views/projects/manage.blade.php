@@ -32,8 +32,12 @@
                             <td class="px-6 py-4 text-gray-500">{{ $project->deadline ? \Carbon\Carbon::parse($project->deadline)->format('d M Y') : '-' }}</td>
                             <td class="px-6 py-4 text-center text-gray-500">{{ $project->tasks ? $project->tasks->count() : 0 }}</td>
                             <td class="px-6 py-4 text-center">
-                                @if($project->status === 'active' || $project->status === 'taken' || $project->status === 'completed')
-                                    <span class="px-4 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Disetujui</span>
+                                @if($project->status === 'active' || $project->status === 'taken')
+                                    <span class="px-4 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Berhasil</span>
+                                @elseif($project->status === 'in_progress')
+                                    <span class="px-4 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Dalam Proses</span>
+                                @elseif($project->status === 'completed')
+                                    <span class="px-4 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Selesai</span>
                                 @elseif($project->status === 'pending')
                                     <span class="px-4 py-1 rounded-full text-xs font-bold bg-gray-200 text-gray-600">Menunggu</span>
                                 @elseif($project->status === 'rejected')

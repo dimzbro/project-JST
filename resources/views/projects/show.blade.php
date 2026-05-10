@@ -31,10 +31,12 @@
                             </div>
                         </div>
                         <div class="text-right">
-                            @if($project->status === 'active' || $project->status === 'completed')
+                            @if($project->status === 'active' || $project->status === 'taken')
                                 <span class="px-4 py-1 rounded-full text-xs font-bold bg-green-200 text-green-700 inline-block mb-1">Berhasil</span>
-                            @elseif($project->status === 'taken')
+                            @elseif($project->status === 'in_progress')
                                 <span class="px-4 py-1 rounded-full text-xs font-bold bg-blue-200 text-blue-700 inline-block mb-1">Dalam Proses</span>
+                            @elseif($project->status === 'completed')
+                                <span class="px-4 py-1 rounded-full text-xs font-bold bg-green-200 text-green-700 inline-block mb-1">Selesai</span>
                             @elseif($project->status === 'pending')
                                 <span class="px-4 py-1 rounded-full text-xs font-bold bg-gray-300 text-gray-700 inline-block mb-1">Menunggu</span>
                             @elseif($project->status === 'rejected')
@@ -90,7 +92,7 @@
                             <div class="flex items-center space-x-2">
                                 <span>{{ $project->tasks ? $project->tasks->count() : 0 }}</span>
                                 <!-- TODO: link to applicant details modal or page -->
-                                <a href="#" class="text-blue-500 font-medium hover:underline">Lihat</a>
+                                <a href="{{ route('client.projects.applicants', $project->id) }}" class="text-blue-500 font-medium hover:underline">Lihat Pelamar</a>
                             </div>
                         </div>
                     </div>

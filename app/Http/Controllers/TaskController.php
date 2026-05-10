@@ -18,7 +18,8 @@ class TaskController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
         }
 
-        $tasks = Task::with('project')->where('worker_id', Auth::id())->latest()->get();
+        // Hanya tampilkan pekerjaan di mana worker telah secara resmi dipilih oleh client
+        $tasks = Task::with('project')->where('worker_id', Auth::id())->where('is_selected', true)->latest()->get();
 
         return view('worker.tasks.index', compact('tasks'));
     }

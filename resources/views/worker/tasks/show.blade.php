@@ -102,9 +102,9 @@
             </div>
 
             <!-- Buttons -->
-            <button type="button" class="w-full bg-[#f8f9fa] hover:bg-[#e9ecef] text-[#333] border border-[#ced4da] font-medium py-3 px-4 rounded-lg shadow-sm mb-3 transition-colors text-sm">
+            <a href="{{ route('worker.chat.show', $task->id) }}" class="w-full flex items-center justify-center bg-[#f8f9fa] hover:bg-[#e9ecef] text-[#333] border border-[#ced4da] font-medium py-3 px-4 rounded-lg shadow-sm mb-3 transition-colors text-sm">
                 Hubungi Client
-            </button>
+            </a>
             
             <button type="button" class="w-full bg-[#5bc0de] hover:bg-[#4eb0ce] text-white font-medium py-3 px-4 rounded-lg shadow-sm transition-colors text-sm">
                 Unggah Hasil

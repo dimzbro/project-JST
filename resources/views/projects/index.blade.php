@@ -89,9 +89,9 @@
                         @if($isTakenByMe)
                             @php $myTaskId = $project->tasks->first()->id; @endphp
                             <span class="text-[12px] italic text-green-500 font-medium">Telah Diambil</span>
-                            <button type="button" onclick="showTakenModal({{ $project->id }}, '{{ addslashes($project->title) }}', '{{ route('worker.tasks.show', $myTaskId) }}')" class="text-[13px] font-medium text-gray-500 hover:text-gray-700 transition-colors flex items-center bg-transparent border-none cursor-pointer">
+                            <a href="{{ route('worker.jobs.show', $project->id) }}" class="text-[13px] font-medium text-gray-500 hover:text-gray-700 transition-colors flex items-center bg-transparent border-none cursor-pointer">
                                 Lihat <svg class="w-3.5 h-3.5 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </button>
+                            </a>
                         @else
                             <span class="text-[12px] italic text-gray-400">Klik untuk detail</span>
                             <a href="{{ route('worker.jobs.show', $project->id) }}" class="text-[13px] font-medium text-[#5bc0de] hover:text-[#4eb0ce] transition-colors flex items-center bg-transparent border-none cursor-pointer">
@@ -112,58 +112,8 @@
         </div>
     </div>
 
-    <!-- Custom Taken Job Modal -->
-    <div id="takenJobModal" style="display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);">
-        <div id="takenModalContent" style="background: white; border-radius: 20px; padding: 32px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.15); animation: modalIn 0.3s ease;">
-            
-            <!-- Icon -->
-            <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #e6f7eb, #baf1cf); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                <svg style="width: 32px; height: 32px; color: #22c55e;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-
-            <!-- Title -->
-            <h3 style="font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;">Pekerjaan Telah Diambil</h3>
-            
-            <!-- Message -->
-            <p style="font-size: 14px; color: #6b7280; margin-bottom: 24px; line-height: 1.5;">
-                Anda telah mengambil pekerjaan <strong id="takenJobTitle" class="text-gray-900"></strong>. Silakan cek menu Tugas Saya untuk melihat detailnya.
-            </p>
-
-            <!-- Buttons -->
-            <div style="display: flex; gap: 12px; justify-content: center;">
-                <button type="button" onclick="closeTakenModal()" style="flex: 1; padding: 12px 20px; border-radius: 12px; border: 1px solid #e5e7eb; background: white; color: #374151; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
-                    Tutup
-                </button>
-                <a id="takenJobLink" href="#" style="flex: 1; margin: 0; text-decoration: none;">
-                    <button type="button" style="width: 100%; padding: 12px 20px; border-radius: 12px; border: none; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(34,197,94,0.3);" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(34,197,94,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(34,197,94,0.3)'">
-                        Lihat Tugas
-                    </button>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.9) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-    </style>
-
     <!-- Script for Search Icon Behavior & Modals -->
     <script>
-        function showTakenModal(id, title, taskUrl) {
-            document.getElementById('takenJobTitle').innerText = title;
-            document.getElementById('takenJobLink').href = taskUrl;
-            document.getElementById('takenJobModal').style.display = 'flex';
-        }
-
-        function closeTakenModal() {
-            document.getElementById('takenJobModal').style.display = 'none';
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('search-input');
             const searchIconWrapper = document.getElementById('search-icon-wrapper');

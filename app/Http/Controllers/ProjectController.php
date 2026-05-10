@@ -71,7 +71,7 @@ class ProjectController extends Controller
         $workerId = Auth::id();
         $query = Project::with(['client', 'tasks' => function($q) use ($workerId) {
             $q->where('worker_id', $workerId);
-        }])->whereIn('status', ['active', 'taken', 'in_progress', 'completed']);
+        }])->whereIn('status', ['active', 'taken']);
 
         // Filter based on search keyword (title, description, or category)
         if ($request->filled('search')) {
@@ -91,7 +91,7 @@ class ProjectController extends Controller
         $projects = $query->latest()->get();
         
         // Get all unique categories from visible projects
-        $categories = Project::whereIn('status', ['active', 'taken', 'in_progress', 'completed'])
+        $categories = Project::whereIn('status', ['active', 'taken'])
             ->whereNotNull('category')
             ->where('category', '!=', '')
             ->distinct()
@@ -115,16 +115,13 @@ class ProjectController extends Controller
             return redirect()->route('jobs.index')->with('error', 'Pekerjaan ini sudah tidak tersedia.');
         }
 
-        // Jika worker sudah pernah mengambil job ini, arahkan ke detail tugasnya
-        if ($project->tasks()->where('worker_id', Auth::id())->exists()) {
-            $taskId = $project->tasks()->where('worker_id', Auth::id())->first()->id;
-            return redirect()->route('worker.tasks.show', $taskId);
-        }
+        // Cari tahu apakah worker sudah mengambil job ini (untuk mengubah tombol)
+        $task = $project->tasks()->where('worker_id', Auth::id())->first();
 
         // Load client details
         $project->load('client');
 
-        return view('projects.job-detail', compact('project'));
+        return view('projects.job-detail', compact('project', 'task'));
     }
 
     /**
@@ -163,7 +160,7 @@ class ProjectController extends Controller
             'type' => 'task'
         ]);
 
-        return redirect()->route('worker.tasks.show', $task->id)->with('success', 'Pekerjaan berhasil diambil. Silakan kerjakan tugas ini.');
+        return redirect()->route('worker.jobs.show', $project->id)->with('success', 'Pekerjaan berhasil diambil. Silakan hubungi client.');
     }
 
     /**
@@ -271,5 +268,45 @@ class ProjectController extends Controller
         $project->load('tasks.worker');
 
         return view('projects.show', compact('project'));
+    }
+
+    /**
+     * Display the applicants for a specific project.
+     */
+    public function applicants(Project $project)
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client' || $project->client_id !== Auth::id()) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        // Load tasks and the associated workers' profiles
+        $project->load('tasks.worker');
+
+        return view('projects.applicants', compact('project'));
+    }
+
+    /**
+     * Client selects a worker for a job, moving the project to in_progress.
+     */
+    public function selectWorker(Task $task)
+    {
+        $role = session()->get('active_role', 'client');
+        $task->load('project');
+        
+        if ($role !== 'client' || $task->project->client_id !== Auth::id()) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        // Update project status to in_progress
+        $task->project->update(['status' => 'in_progress']);
+        $task->update(['is_selected' => true]);
+
+        ActivityLog::create([
+            'description' => 'Client ' . Auth::user()->first_name . ' memilih worker untuk pekerjaan: ' . $task->project->title,
+            'type' => 'project'
+        ]);
+
+        return redirect()->back()->with('success', 'Berhasil memilih worker. Pekerjaan sekarang dalam status in_progress.');
     }
 }
