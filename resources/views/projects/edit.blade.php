@@ -13,7 +13,11 @@
             <p class="text-gray-500 text-xs">Berikan informasi lengkap agar calon pekerja memahami tugas yang diberikan.</p>
         </div>
 
-        <form action="{{ route('projects.update', $project->id) }}" method="POST">
+        <div id="yellow-alert" class="hidden mb-6 p-4 rounded" style="background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-size: 0.875rem;">
+            Mohon isi semua field (Judul Pekerjaan, Kategori, Anggaran, Deskripsi, Batas Waktu) sebelum menyimpan perubahan.
+        </div>
+
+        <form id="editForm" action="{{ route('projects.update', $project->id) }}" method="POST">
             @csrf
             @method('PUT')
             
@@ -22,8 +26,7 @@
                 <div class="md:col-span-1">
                     <label for="title" class="block text-sm font-semibold text-gray-800 mb-2">Judul Pekerjaan</label>
                     <input type="text" id="title" name="title" value="{{ old('title', $project->title) }}" 
-                        class="w-full bg-white border border-gray-300 rounded shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-800"
-                        required>
+                        class="w-full bg-white border border-gray-300 rounded shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-800">
                     @error('title')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
@@ -60,8 +63,7 @@
                 <div class="md:col-span-2">
                     <label for="description" class="block text-sm font-semibold text-gray-800 mb-2">Deskripsi Lengkap</label>
                     <textarea id="description" name="description" rows="7" 
-                        class="w-full bg-white border border-gray-300 rounded shadow-sm py-3 px-4 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-800 leading-relaxed"
-                        required>{{ old('description', $project->description) }}</textarea>
+                        class="w-full bg-white border border-gray-300 rounded shadow-sm py-3 px-4 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-800 leading-relaxed">{{ old('description', $project->description) }}</textarea>
                     @error('description')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
@@ -90,4 +92,29 @@
         </div>
         </div>
     </div>
+    
+    <script>
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            let inputs = this.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], textarea');
+            let empty = false;
+            
+            inputs.forEach(function(input) {
+                if (input.value.trim() === '') {
+                    empty = true;
+                    // Optional: Highlight empty inputs with a red border
+                    input.style.borderColor = '#ef4444';
+                } else {
+                    input.style.borderColor = '#d1d5db';
+                }
+            });
+            
+            if (empty) {
+                e.preventDefault();
+                document.getElementById('yellow-alert').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                document.getElementById('yellow-alert').classList.add('hidden');
+            }
+        });
+    </script>
 </x-app-layout>

@@ -254,14 +254,35 @@ class ProjectController extends Controller
         return redirect()->route('projects.manage')->with('success', 'Pekerjaan berhasil dihapus.');
     }
 
-    /**
-     * Display the specified project and its applicants (tasks).
-     */
     public function show(Project $project)
     {
         $role = session()->get('active_role', 'client');
         if ($role !== 'client' || $project->client_id !== Auth::id()) {
             return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        // Cek apakah ada task yang sudah di-upload (status in_review)
+        $reviewTask = $project->tasks()->whereIn('status', ['in_review', 'completed'])->where('is_selected', true)->first();
+        
+        if ($reviewTask) {
+            $reviewTask->load(['project', 'worker']);
+            
+            $uploadedFiles = [];
+            if ($reviewTask->upload_path) {
+                $uploadedFiles = json_decode($reviewTask->upload_path, true);
+            }
+
+            $biayaJasaDasar = $reviewTask->project->budget;
+            $biayaLayananPlatform = $biayaJasaDasar * 0.10; // Asumsi 10%
+            $totalTagihan = $biayaJasaDasar + $biayaLayananPlatform;
+
+            return view('client.tasks.review', [
+                'task' => $reviewTask,
+                'uploadedFiles' => $uploadedFiles,
+                'biayaJasaDasar' => $biayaJasaDasar,
+                'biayaLayananPlatform' => $biayaLayananPlatform,
+                'totalTagihan' => $totalTagihan
+            ]);
         }
 
         // Load tasks and the associated workers
