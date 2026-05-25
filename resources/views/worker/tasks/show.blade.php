@@ -12,6 +12,12 @@
         </div>
     @endif
     
+    @if(session('error'))
+        <div class="mb-4 p-3 text-red-700 bg-red-100 rounded-lg border border-red-200 text-sm">
+            {{ session('error') }}
+        </div>
+    @endif
+    
     <div style="display: flex; gap: 24px; align-items: flex-start;">
         <!-- Left Column -->
         <div style="flex: 1; min-width: 0;">
@@ -106,9 +112,19 @@
                 Hubungi Client
             </a>
             
-            <button type="button" class="w-full bg-[#5bc0de] hover:bg-[#4eb0ce] text-white font-medium py-3 px-4 rounded-lg shadow-sm transition-colors text-sm">
-                Unggah Hasil
-            </button>
+            @if($task->status === 'in_progress' || $task->status === 'revision_requested')
+                <a href="{{ route('worker.tasks.upload', $task->id) }}" class="w-full flex items-center justify-center bg-[#5bc0de] hover:bg-[#4eb0ce] text-white font-medium py-3 px-4 rounded-lg shadow-sm transition-colors text-sm">
+                    Unggah Hasil
+                </a>
+            @elseif($task->status === 'in_review')
+                <button disabled class="w-full flex items-center justify-center text-white font-medium py-3 px-4 rounded-lg shadow-sm cursor-not-allowed text-sm" style="background-color: #9ca3af;">
+                    Menunggu Persetujuan Client
+                </button>
+            @elseif($task->status === 'completed')
+                <button disabled class="w-full flex items-center justify-center text-white font-medium py-3 px-4 rounded-lg shadow-sm cursor-not-allowed text-sm" style="background-color: #22c55e;">
+                    Selesai
+                </button>
+            @endif
         </div>
     </div>
 </x-app-layout>

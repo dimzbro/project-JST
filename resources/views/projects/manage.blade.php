@@ -35,7 +35,7 @@
                                 @if($project->status === 'active' || $project->status === 'taken')
                                     <span class="px-4 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Berhasil</span>
                                 @elseif($project->status === 'in_progress')
-                                    <span class="px-4 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Dalam Proses</span>
+                                    <span class="px-4 py-1 rounded-full text-xs font-medium" style="background-color: #e0f2fe; color: #0ea5e9;">Dalam Proses</span>
                                 @elseif($project->status === 'completed')
                                     <span class="px-4 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Selesai</span>
                                 @elseif($project->status === 'pending')

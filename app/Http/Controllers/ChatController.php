@@ -40,9 +40,9 @@ class ChatController extends Controller
             abort(403, 'Anda tidak memiliki akses ke percakapan ini.');
         }
 
-        // Check if client has initiated the chat globally
+        // If chat hasn't been created, mark it as created so they can chat
         if (!\Illuminate\Support\Facades\Cache::has('chat_created_' . $task->id)) {
-            return redirect()->back()->with('error', 'Chat belum tersedia. Klien belum menghubungi Anda untuk pekerjaan ini.');
+            \Illuminate\Support\Facades\Cache::put('chat_created_' . $task->id, true, now()->addDays(1));
         }
 
         // Get the opposing user details (for worker, it's the client)
