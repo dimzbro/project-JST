@@ -1,3 +1,4 @@
+@props(['hideSidebar' => false])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -10,6 +11,7 @@
     </head>
     <body class="font-sans antialiased bg-white text-gray-900 flex h-screen overflow-hidden">
         
+        @if(!$hideSidebar)
         <!-- Sidebar -->
         <aside class="w-64 bg-[#f4f8fe] flex-shrink-0 h-full border-r border-gray-100 flex flex-col">
             <div class="p-6 flex items-center">
@@ -28,8 +30,8 @@
                         Admin Panel
                     </a>
                     
-                    <a href="#" class="flex items-center px-2 py-3 text-sm font-medium text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-md">
-                        <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <a href="{{ route('admin.verification.index') }}" class="flex items-center px-2 py-3 text-sm font-medium {{ request()->routeIs('admin.verification.*') ? 'text-gray-800 bg-white shadow-sm font-semibold' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50' }} rounded-md">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('admin.verification.*') ? 'text-gray-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Verifikasi
                     </a>
 
@@ -48,13 +50,14 @@
                         Dashboard
                     </a>
                     
-                    <a href="#" class="flex items-center px-2 py-3 text-sm font-medium text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-md">
-                        <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <a href="{{ route('projects.manage') }}" class="flex items-center px-2 py-3 text-sm font-medium {{ request()->routeIs('projects.manage') ? 'text-gray-800 bg-white shadow-sm font-semibold' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50' }} rounded-md">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('projects.manage') ? 'text-gray-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                         Kelola Pekerjaan
                     </a>
 
-                    <a href="{{ route('tasks.my_tasks') }}" class="flex items-center px-2 py-3 text-sm font-medium {{ request()->routeIs('tasks.my_tasks') ? 'text-gray-800 bg-white shadow-sm font-semibold' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50' }} rounded-md">
-                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('tasks.my_tasks') ? 'text-gray-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+
+                    <a href="{{ route('worker.tasks.index') }}" class="flex items-center px-2 py-3 text-sm font-medium {{ request()->routeIs('worker.tasks.*') ? 'text-gray-800 bg-white shadow-sm font-semibold' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50' }} rounded-md">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('worker.tasks.*') ? 'text-gray-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                         Tugas Saya
                     </a>
 
@@ -79,10 +82,20 @@
                 </form>
             </div>
         </aside>
+        @endif
 
         <!-- Main Content -->
         <main class="flex-1 h-full overflow-y-auto">
-            <header class="h-16 flex items-center justify-end px-8 border-b border-gray-100">
+            <header class="h-16 flex items-center justify-between px-8 border-b border-gray-100">
+                @if($hideSidebar)
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-blue-200 text-blue-600 font-bold text-xl flex items-center justify-center italic mr-3" style="font-family: serif;">JST</div>
+                    <h1 class="text-xl font-bold text-blue-500">Job Sharing Task</h1>
+                </div>
+                @else
+                <div></div>
+                @endif
+                
                 <div class="flex items-center">
                     <span class="mr-3 text-sm font-medium text-gray-700">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span>
                     <div class="w-8 h-8 rounded-full bg-gray-300 overflow-hidden flex-shrink-0">
@@ -97,7 +110,7 @@
                 </div>
             </header>
             
-            <div class="p-8">
+            <div class="p-4">
                 {{ $slot }}
             </div>
         </main>

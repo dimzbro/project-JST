@@ -44,7 +44,7 @@ class ProjectController extends Controller
         ]);
 
         $validated['client_id'] = Auth::id();
-        $validated['status'] = 'active';
+        $validated['status'] = 'pending';
 
         $project = Project::create($validated);
 
@@ -60,7 +60,7 @@ class ProjectController extends Controller
     /**
      * Show available active projects for workers.
      */
-    public function index()
+    public function index(Request $request)
     {
         // Only workers should be able to see available jobs
         $role = session()->get('active_role', 'client');
@@ -68,9 +68,60 @@ class ProjectController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya worker yang bisa mencari pekerjaan.');
         }
 
-        $projects = Project::with('client')->where('status', 'active')->latest()->get();
+        $workerId = Auth::id();
+        $query = Project::with(['client', 'tasks' => function($q) use ($workerId) {
+            $q->where('worker_id', $workerId);
+        }])->whereIn('status', ['active', 'taken']);
 
-        return view('projects.index', compact('projects'));
+        // Filter based on search keyword (title, description, or category)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter based on category
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        $projects = $query->latest()->get();
+        
+        // Get all unique categories from visible projects
+        $categories = Project::whereIn('status', ['active', 'taken'])
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->pluck('category');
+
+        return view('projects.index', compact('projects', 'categories'));
+    }
+
+    /**
+     * Show detail of an active project for workers.
+     */
+    public function jobDetail(Project $project)
+    {
+        // Only workers should be able to see job details
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'worker') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya worker yang bisa melihat detail pekerjaan.');
+        }
+
+        if (!in_array($project->status, ['active', 'taken', 'in_progress', 'completed'])) {
+            return redirect()->route('jobs.index')->with('error', 'Pekerjaan ini sudah tidak tersedia.');
+        }
+
+        // Cari tahu apakah worker sudah mengambil job ini (untuk mengubah tombol)
+        $task = $project->tasks()->where('worker_id', Auth::id())->first();
+
+        // Load client details
+        $project->load('client');
+
+        return view('projects.job-detail', compact('project', 'task'));
     }
 
     /**
@@ -84,12 +135,17 @@ class ProjectController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya worker yang bisa mengambil pekerjaan.');
         }
 
-        if ($project->status !== 'active') {
+        if (!in_array($project->status, ['active', 'taken', 'in_progress', 'completed'])) {
             return redirect()->back()->with('error', 'Pekerjaan ini sudah tidak tersedia.');
         }
 
+        // Cek apakah worker ini sudah pernah mengambil project ini
+        if ($project->tasks()->where('worker_id', Auth::id())->exists()) {
+            return redirect()->back()->with('error', 'Anda sudah mengambil pekerjaan ini sebelumnya.');
+        }
+
         // Create Task
-        Task::create([
+        $task = Task::create([
             'project_id' => $project->id,
             'worker_id' => Auth::id(),
             'status' => 'in_progress',
@@ -104,6 +160,174 @@ class ProjectController extends Controller
             'type' => 'task'
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Pekerjaan berhasil diambil. Silakan cek di menu pekerjaan aktif Anda.');
+        return redirect()->route('worker.jobs.show', $project->id)->with('success', 'Pekerjaan berhasil diambil. Silakan hubungi client.');
+    }
+
+    /**
+     * Client manages their jobs.
+     */
+    public function manage()
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya client yang bisa mengelola pekerjaan.');
+        }
+
+        $projects = Project::where('client_id', Auth::id())->latest()->get();
+
+        return view('projects.manage', compact('projects'));
+    }
+    /**
+     * Show the form for editing the specified project.
+     */
+    public function edit(Project $project)
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client' || $project->client_id !== Auth::id()) {
+            return redirect()->route('projects.manage')->with('error', 'Akses ditolak.');
+        }
+
+        if (!in_array($project->status, ['pending', 'rejected'])) {
+            return redirect()->route('projects.manage')->with('error', 'Pekerjaan yang sudah diproses atau disetujui tidak dapat diedit.');
+        }
+
+        return view('projects.edit', compact('project'));
+    }
+
+    /**
+     * Update the specified project in storage.
+     */
+    public function update(Request $request, Project $project)
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client' || $project->client_id !== Auth::id()) {
+            return redirect()->route('projects.manage')->with('error', 'Akses ditolak.');
+        }
+
+        if (!in_array($project->status, ['pending', 'rejected'])) {
+            return redirect()->route('projects.manage')->with('error', 'Pekerjaan yang sudah diproses atau disetujui tidak dapat diedit.');
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'category' => 'nullable|string|max:255',
+            'budget' => 'nullable|numeric|min:0',
+            'description' => 'required|string',
+            'deadline' => 'nullable|date',
+        ]);
+
+        // Reset status to pending so admin can re-verify the edited project
+        $validated['status'] = 'pending';
+
+        $project->update($validated);
+
+        ActivityLog::create([
+            'description' => 'Client ' . Auth::user()->first_name . ' mengedit pekerjaan: ' . $project->title,
+            'type' => 'project'
+        ]);
+
+        return redirect()->route('projects.manage')->with('success', 'Pekerjaan berhasil diperbarui.');
+    }
+
+    /**
+     * Remove the specified project from storage.
+     */
+    public function destroy(Project $project)
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client' || $project->client_id !== Auth::id()) {
+            return redirect()->route('projects.manage')->with('error', 'Akses ditolak.');
+        }
+
+        if (!in_array($project->status, ['pending', 'rejected'])) {
+            return redirect()->route('projects.manage')->with('error', 'Pekerjaan yang sudah diproses atau disetujui tidak dapat dihapus.');
+        }
+
+        $projectTitle = $project->title;
+        $project->delete();
+
+        ActivityLog::create([
+            'description' => 'Client ' . Auth::user()->first_name . ' menghapus pekerjaan: ' . $projectTitle,
+            'type' => 'project'
+        ]);
+
+        return redirect()->route('projects.manage')->with('success', 'Pekerjaan berhasil dihapus.');
+    }
+
+    public function show(Project $project)
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client' || $project->client_id !== Auth::id()) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        // Cek apakah ada task yang sudah di-upload (status in_review)
+        $reviewTask = $project->tasks()->whereIn('status', ['in_review', 'completed'])->where('is_selected', true)->first();
+        
+        if ($reviewTask) {
+            $reviewTask->load(['project', 'worker']);
+            
+            $uploadedFiles = [];
+            if ($reviewTask->upload_path) {
+                $uploadedFiles = json_decode($reviewTask->upload_path, true);
+            }
+
+            $biayaJasaDasar = $reviewTask->project->budget;
+            $biayaLayananPlatform = $biayaJasaDasar * 0.10; // Asumsi 10%
+            $totalTagihan = $biayaJasaDasar + $biayaLayananPlatform;
+
+            return view('client.tasks.review', [
+                'task' => $reviewTask,
+                'uploadedFiles' => $uploadedFiles,
+                'biayaJasaDasar' => $biayaJasaDasar,
+                'biayaLayananPlatform' => $biayaLayananPlatform,
+                'totalTagihan' => $totalTagihan
+            ]);
+        }
+
+        // Load tasks and the associated workers
+        $project->load('tasks.worker');
+
+        return view('projects.show', compact('project'));
+    }
+
+    /**
+     * Display the applicants for a specific project.
+     */
+    public function applicants(Project $project)
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client' || $project->client_id !== Auth::id()) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        // Load tasks and the associated workers' profiles
+        $project->load('tasks.worker');
+
+        return view('projects.applicants', compact('project'));
+    }
+
+    /**
+     * Client selects a worker for a job, moving the project to in_progress.
+     */
+    public function selectWorker(Task $task)
+    {
+        $role = session()->get('active_role', 'client');
+        $task->load('project');
+        
+        if ($role !== 'client' || $task->project->client_id !== Auth::id()) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        // Update project status to in_progress
+        $task->project->update(['status' => 'in_progress']);
+        $task->update(['is_selected' => true]);
+
+        ActivityLog::create([
+            'description' => 'Client ' . Auth::user()->first_name . ' memilih worker untuk pekerjaan: ' . $task->project->title,
+            'type' => 'project'
+        ]);
+
+        return redirect()->back()->with('success', 'Berhasil memilih worker. Pekerjaan sekarang dalam status in_progress.');
     }
 }
