@@ -163,5 +163,38 @@ class TaskController extends Controller
 
         return back()->with('success', 'Revisi telah diminta ke worker.');
     }
+
+    /**
+     * Client rates the worker's completed task.
+     */
+    public function clientRate(Request $request, Task $task)
+    {
+        $role = session()->get('active_role', 'client');
+        $task->load(['project', 'worker']);
+        if ($role !== 'client' || $task->project->client_id !== Auth::id()) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        if ($task->status !== 'completed') {
+            return back()->with('error', 'Pekerjaan belum diselesaikan.');
+        }
+
+        if ($task->rating !== null) {
+            return back()->with('error', 'Anda sudah memberikan rating untuk pekerjaan ini.');
+        }
+
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:10',
+        ]);
+
+        $rating = (int) $request->input('rating');
+        $task->rating = $rating;
+        $task->save();
+
+        // Update the worker's average rating in users table
+        $task->worker->addRating($rating);
+
+        return back()->with('success', 'Terima kasih! Rating berhasil diberikan kepada worker.');
+    }
 }
 

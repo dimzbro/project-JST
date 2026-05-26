@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/client/tasks/{task}/review', [\App\Http\Controllers\TaskController::class, 'clientReview'])->name('client.tasks.review');
     Route::post('/client/tasks/{task}/accept', [\App\Http\Controllers\TaskController::class, 'clientAccept'])->name('client.tasks.accept');
     Route::post('/client/tasks/{task}/revise', [\App\Http\Controllers\TaskController::class, 'clientRevise'])->name('client.tasks.revise');
+    Route::post('/client/tasks/{task}/rate', [\App\Http\Controllers\TaskController::class, 'clientRate'])->name('client.tasks.rate');
     Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');

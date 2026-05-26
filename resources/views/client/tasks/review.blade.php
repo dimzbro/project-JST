@@ -161,7 +161,7 @@
                     </div>
                     
                     <div class="flex justify-between items-center font-bold text-lg pt-4 border-t border-gray-200">
-                        <span class="text-gray-800">Total Tagihan</span>
+                        <span class="text-gray-800">{{ $task->status === 'completed' ? 'Berhasil Dibayar' : 'Total Tagihan' }}</span>
                         <span class="text-[#5bc0de]">Rp. {{ number_format($totalTagihan, 0, ',', '.') }}</span>
                     </div>
                 </div>
@@ -185,9 +185,50 @@
                 </form>
             </div>
             @else
-            <div class="mt-6 p-4 bg-green-50 text-green-700 rounded-lg border border-green-200 text-center font-medium">
-                Pekerjaan telah diselesaikan dan dibayar.
-            </div>
+                @if(is_null($task->rating))
+                <div class="mt-6">
+                    <button type="button" id="btn-beri-rating" class="w-full font-semibold transition text-center" style="display: block; width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 12px; font-weight: 600; text-align: center; color: #1f2937; background-color: #fff; cursor: pointer; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                        Beri Rating
+                    </button>
+                    
+                    <div id="rating-form-container" class="mt-6 text-center" style="display: none;">
+                        <!-- Star Icons (10 Stars) -->
+                        <div class="flex justify-between items-center mb-3" id="star-rating-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; width: 100%;">
+                            @for($i = 1; $i <= 10; $i++)
+                                <button type="button" data-value="{{ $i }}" class="star-btn hover:scale-110 transition-transform" style="background: none; border: none; padding: 0; cursor: pointer;">
+                                    <svg class="star-svg" style="width: 28px; height: 28px; transition: transform 0.1s;" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499c.198-.39.754-.39.952 0l2.253 4.437 5.03 1.054c.451.095.632.628.324.957l-3.528 3.513 1.002 5.093c.09.458-.415.807-.81.603L12 17.905l-4.71 2.251c-.394.204-.9-.145-.81-.603l1.002-5.093-3.528-3.513c-.308-.329-.127-.862.324-.957l5.03-1.054 2.253-4.437z"/>
+                                    </svg>
+                                </button>
+                            @endfor
+                        </div>
+                        
+                        <!-- Rating Helper Text -->
+                        <p id="rating-helper-text" class="text-xs text-gray-500 mb-2 leading-relaxed" style="display: block; font-size: 0.75rem; color: #6b7280; line-height: 1.625; margin-bottom: 8px;">
+                            Berikan rating worker yang telah mengerjakan pekerjaan Anda.
+                        </p>
+
+                        <!-- Rating Action Form -->
+                        <form id="rating-submit-form" action="{{ route('client.tasks.rate', $task->id) }}" method="POST" style="display: none;">
+                            @csrf
+                            <input type="hidden" name="rating" id="selected-rating-value" value="">
+                            
+                            <div class="flex items-center justify-between gap-4 mt-2" style="display: flex; gap: 16px; margin-top: 8px;">
+                                <button type="button" id="btn-cancel-rating" class="flex-1 font-medium transition" style="flex: 1; padding: 10px; border-radius: 12px; border: 1px solid #d1d5db; color: #374151; background-color: #fff; cursor: pointer; text-align: center;">
+                                    Batal
+                                </button>
+                                <button type="submit" class="flex-1 font-medium transition" style="flex: 1; padding: 10px; border-radius: 12px; border: none; color: #fff; background-color: #5bc0de; cursor: pointer; text-align: center;">
+                                    Selesai
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                @else
+                <div class="mt-6 p-4 bg-green-50 text-green-700 rounded-lg border border-green-200 text-center font-medium">
+                    Pekerjaan telah diselesaikan dan dibayar.
+                </div>
+                @endif
             @endif
         </div>
     </div>
@@ -414,5 +455,76 @@
         function submitReviseForm() {
             document.getElementById('reviseForm').submit();
         }
+
+        // Rating Star Interactions
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnBeriRating = document.getElementById('btn-beri-rating');
+            const ratingFormContainer = document.getElementById('rating-form-container');
+            const starBtns = document.querySelectorAll('.star-btn');
+            const ratingHelperText = document.getElementById('rating-helper-text');
+            const ratingSubmitForm = document.getElementById('rating-submit-form');
+            const selectedRatingValue = document.getElementById('selected-rating-value');
+            const btnCancelRating = document.getElementById('btn-cancel-rating');
+            
+            let currentRating = 0;
+
+            if (btnBeriRating) {
+                btnBeriRating.addEventListener('click', function () {
+                    btnBeriRating.style.display = 'none';
+                    ratingFormContainer.style.display = 'block';
+                });
+            }
+
+            if (btnCancelRating) {
+                btnCancelRating.addEventListener('click', function () {
+                    ratingFormContainer.style.display = 'none';
+                    btnBeriRating.style.display = 'block';
+                    resetStars();
+                    currentRating = 0;
+                    selectedRatingValue.value = '';
+                    ratingHelperText.style.display = 'block';
+                    ratingSubmitForm.style.display = 'none';
+                });
+            }
+
+            starBtns.forEach(btn => {
+                btn.addEventListener('mouseover', function () {
+                    const hoverValue = parseInt(this.getAttribute('data-value'));
+                    highlightStars(hoverValue);
+                });
+
+                btn.addEventListener('mouseout', function () {
+                    highlightStars(currentRating);
+                });
+
+                btn.addEventListener('click', function () {
+                    currentRating = parseInt(this.getAttribute('data-value'));
+                    selectedRatingValue.value = currentRating;
+                    highlightStars(currentRating);
+                    ratingHelperText.style.display = 'none';
+                    ratingSubmitForm.style.display = 'block';
+                });
+            });
+
+            function highlightStars(count) {
+                starBtns.forEach(btn => {
+                    const val = parseInt(btn.getAttribute('data-value'));
+                    const svg = btn.querySelector('.star-svg');
+                    if (svg) {
+                        if (val <= count) {
+                            svg.setAttribute('fill', '#facc15'); // Yellow filled color
+                            svg.setAttribute('stroke', '#facc15');
+                        } else {
+                            svg.setAttribute('fill', 'none');
+                            svg.setAttribute('stroke', '#d1d5db'); // Gray stroke color
+                        }
+                    }
+                });
+            }
+
+            function resetStars() {
+                highlightStars(0);
+            }
+        });
     </script>
 </x-app-layout>
