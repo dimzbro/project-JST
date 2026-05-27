@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -185,16 +186,31 @@ class TaskController extends Controller
 
         $request->validate([
             'rating' => 'required|integer|min:1|max:10',
+            'review' => 'nullable|string|max:1000',
         ]);
 
         $rating = (int) $request->input('rating');
         $task->rating = $rating;
+        $task->review = $request->input('review');
         $task->save();
 
         // Update the worker's average rating in users table
         $task->worker->addRating($rating);
 
-        return back()->with('success', 'Terima kasih! Rating berhasil diberikan kepada worker.');
+        // Log aktivitas ke admin panel
+        $clientName  = Auth::user()->first_name . ' ' . Auth::user()->last_name;
+        $workerName  = $task->worker->first_name . ' ' . $task->worker->last_name;
+        $projectTitle = $task->project->title ?? 'pekerjaan';
+        $reviewSnippet = $task->review
+            ? ' — Ulasan: "' . \Illuminate\Support\Str::limit($task->review, 60) . '"'
+            : ' (tanpa ulasan teks)';
+
+        ActivityLog::create([
+            'description' => 'Client ' . $clientName . ' memberi rating ' . $rating . '/10 kepada Worker ' . $workerName . ' untuk pekerjaan: ' . $projectTitle . $reviewSnippet,
+            'type'        => 'rating',
+        ]);
+
+        return back()->with('success', 'Terima kasih! Rating dan ulasan berhasil diberikan kepada worker.');
     }
 }
 

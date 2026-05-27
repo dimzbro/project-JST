@@ -10,8 +10,18 @@ class ProfileController extends Controller
 {
     public function edit()
     {
+        $user = Auth::user();
+
+        // Query semua task di mana user ini berperan sebagai worker dan sudah diberi rating
+        $receivedRatings = \App\Models\Task::with(['project.client'])
+            ->where('worker_id', $user->id)
+            ->whereNotNull('rating')
+            ->latest()
+            ->get();
+
         return view('profile', [
-            'user' => Auth::user(),
+            'user' => $user,
+            'receivedRatings' => $receivedRatings,
         ]);
     }
 

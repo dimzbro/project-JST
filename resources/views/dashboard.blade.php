@@ -89,6 +89,7 @@
                                 if($log->type == 'project') $colorClass = 'bg-orange-500';
                                 if($log->type == 'task') $colorClass = 'bg-green-500';
                                 if($log->type == 'transaction') $colorClass = 'bg-purple-500';
+                                if($log->type == 'rating') $colorClass = 'bg-yellow-400';
                             @endphp
                             <div class="w-2 h-2 mt-1.5 {{ $colorClass }} rounded-full mr-3 flex-shrink-0"></div>
                             <div>

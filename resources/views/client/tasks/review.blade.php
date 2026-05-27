@@ -212,13 +212,19 @@
                         <form id="rating-submit-form" action="{{ route('client.tasks.rate', $task->id) }}" method="POST" style="display: none;">
                             @csrf
                             <input type="hidden" name="rating" id="selected-rating-value" value="">
+
+                            <!-- Textarea Ulasan -->
+                            <div id="review-textarea-container" style="margin-top: 12px; text-align: left;">
+                                <label for="review-text" style="display: block; font-size: 0.75rem; font-weight: 600; color: #374151; margin-bottom: 6px;">Ulasan Anda <span style="color:#9ca3af; font-weight:400;">(opsional)</span></label>
+                                <textarea id="review-text" name="review" rows="3" placeholder="Bagaimana kinerja worker? Apakah hasil memuaskan? Apakah pengerjaan cepat?" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 0.8125rem; color: #374151; resize: vertical; outline: none; font-family: inherit; line-height: 1.5; box-sizing: border-box;" onfocus="this.style.borderColor='#5bc0de'" onblur="this.style.borderColor='#d1d5db'"></textarea>
+                            </div>
                             
-                            <div class="flex items-center justify-between gap-4 mt-2" style="display: flex; gap: 16px; margin-top: 8px;">
+                            <div class="flex items-center justify-between gap-4 mt-2" style="display: flex; gap: 16px; margin-top: 10px;">
                                 <button type="button" id="btn-cancel-rating" class="flex-1 font-medium transition" style="flex: 1; padding: 10px; border-radius: 12px; border: 1px solid #d1d5db; color: #374151; background-color: #fff; cursor: pointer; text-align: center;">
                                     Batal
                                 </button>
                                 <button type="submit" class="flex-1 font-medium transition" style="flex: 1; padding: 10px; border-radius: 12px; border: none; color: #fff; background-color: #5bc0de; cursor: pointer; text-align: center;">
-                                    Selesai
+                                    Kirim Rating
                                 </button>
                             </div>
                         </form>
@@ -482,6 +488,9 @@
                     resetStars();
                     currentRating = 0;
                     selectedRatingValue.value = '';
+                    // Reset textarea ulasan
+                    const reviewText = document.getElementById('review-text');
+                    if (reviewText) reviewText.value = '';
                     ratingHelperText.style.display = 'block';
                     ratingSubmitForm.style.display = 'none';
                 });
@@ -503,6 +512,9 @@
                     highlightStars(currentRating);
                     ratingHelperText.style.display = 'none';
                     ratingSubmitForm.style.display = 'block';
+                    // Tampilkan textarea ulasan
+                    const reviewContainer = document.getElementById('review-textarea-container');
+                    if (reviewContainer) reviewContainer.style.display = 'block';
                 });
             });
 
