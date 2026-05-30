@@ -161,10 +161,39 @@ class ProjectController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya client yang bisa mengelola pekerjaan.');
         }
 
-        $projects = Project::where('client_id', Auth::id())->latest()->get();
+        // Hanya mengambil proyek yang statusnya bukan completed (aktif/incomplete) untuk menghindari duplikasi data
+        $projects = Project::where('client_id', Auth::id())
+            ->whereNotIn('status', ['completed'])
+            ->latest()
+            ->get();
 
         return view('projects.manage', compact('projects'));
     }
+
+    /**
+     * Display a listing of the completed/paid projects for the client.
+     */
+    public function history()
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'client') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        // Ambil data pekerjaan milik client yang sudah selesai (status == completed)
+        // Dan relasikan dengan tasks yang is_selected = true serta memuat worker yang mengerjakan.
+        // TODO: gunakan paid_at, payment_status, atau payment_verified ketika modul pembayaran riil sudah terintegrasi.
+        $projects = Project::with(['tasks' => function($query) {
+                $query->where('is_selected', true)->with('worker');
+            }])
+            ->where('client_id', Auth::id())
+            ->where('status', 'completed')
+            ->latest()
+            ->get();
+
+        return view('client.projects.history', compact('projects'));
+    }
+
     /**
      * Show the form for editing the specified project.
      */

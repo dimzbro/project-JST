@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/manage', [ProjectController::class, 'manage'])->name('projects.manage');
+    Route::get('/client/history', [ProjectController::class, 'history'])->name('client.projects.history');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
@@ -38,6 +39,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/jobs/{project}/take', [ProjectController::class, 'take'])->name('jobs.take');
 
     Route::get('/worker/tasks', [\App\Http\Controllers\TaskController::class, 'index'])->name('worker.tasks.index');
+    Route::get('/worker/history', [\App\Http\Controllers\TaskController::class, 'history'])->name('worker.tasks.history');
+    Route::get('/worker/tasks/{task}', [\App\Http\Controllers\TaskController::class, 'show'])->name('worker.tasks.show');
+    Route::get('/worker/tasks/{task}/upload', [\App\Http\Controllers\TaskController::class, 'kirimHasil'])->name('worker.tasks.upload');
+    Route::post('/worker/tasks/{task}/upload', [\App\Http\Controllers\TaskController::class, 'uploadTugas'])->name('worker.tasks.upload.store');
+
+    // Internal Chat Routes
+    // Route::get('/client/chat/{task}/initiate', [\App\Http\Controllers\ChatController::class, 'clientInitiate'])->name('client.chat.initiate');
+    // Route::get('/worker/chat/{task}', [\App\Http\Controllers\ChatController::class, 'workerShow'])->name('worker.chat.show');
 
     Route::get('/admin/verifikasi', [App\Http\Controllers\AdminVerificationController::class, 'index'])->name('admin.verification.index');
     Route::get('/admin/verifikasi/{project}', [App\Http\Controllers\AdminVerificationController::class, 'show'])->name('admin.verification.show');
