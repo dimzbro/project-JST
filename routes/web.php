@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/manage', [ProjectController::class, 'manage'])->name('projects.manage');
+    Route::get('/client/history', [ProjectController::class, 'history'])->name('client.projects.history');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::get('/client/projects/{project}/applicants', [ProjectController::class, 'applicants'])->name('client.projects.applicants');
     Route::post('/client/tasks/{task}/select', [ProjectController::class, 'selectWorker'])->name('client.tasks.select');
@@ -45,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/jobs/{project}/take', [ProjectController::class, 'take'])->name('jobs.take');
 
     Route::get('/worker/tasks', [\App\Http\Controllers\TaskController::class, 'index'])->name('worker.tasks.index');
+    Route::get('/worker/history', [\App\Http\Controllers\TaskController::class, 'history'])->name('worker.tasks.history');
     Route::get('/worker/tasks/{task}', [\App\Http\Controllers\TaskController::class, 'show'])->name('worker.tasks.show');
     Route::get('/worker/tasks/{task}/upload', [\App\Http\Controllers\TaskController::class, 'kirimHasil'])->name('worker.tasks.upload');
     Route::post('/worker/tasks/{task}/upload', [\App\Http\Controllers\TaskController::class, 'uploadTugas'])->name('worker.tasks.upload.store');

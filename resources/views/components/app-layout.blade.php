@@ -6,8 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ config('app.name', 'Job Sharing Task') }} - Dashboard</title>
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:400,500,600&display=swap" rel="stylesheet" />
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="font-sans antialiased bg-white text-gray-900 flex h-screen overflow-hidden">
         
@@ -55,14 +54,13 @@
                         Kelola Pekerjaan
                     </a>
 
-
                     <a href="{{ route('worker.tasks.index') }}" class="flex items-center px-2 py-3 text-sm font-medium {{ request()->routeIs('worker.tasks.*') ? 'text-gray-800 bg-white shadow-sm font-semibold' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50' }} rounded-md">
                         <svg class="w-5 h-5 mr-3 {{ request()->routeIs('worker.tasks.*') ? 'text-gray-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                         Tugas Saya
                     </a>
 
-                    <a href="#" class="flex items-center px-2 py-3 text-sm font-medium text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-md">
-                        <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <a href="{{ session('active_role') === 'client' ? route('client.projects.history') : route('worker.tasks.history') }}" class="flex items-center px-2 py-3 text-sm font-medium {{ (request()->routeIs('worker.tasks.history') || request()->routeIs('client.projects.history')) ? 'text-gray-800 bg-white shadow-sm font-semibold' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50' }} rounded-md">
+                        <svg class="w-5 h-5 mr-3 {{ (request()->routeIs('worker.tasks.history') || request()->routeIs('client.projects.history')) ? 'text-gray-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Riwayat
                     </a>
 

@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
-
     /**
      * Display a listing of the tasks assigned to the worker.
      */
@@ -20,10 +19,35 @@ class TaskController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
         }
 
-        // Hanya tampilkan pekerjaan di mana worker telah secara resmi dipilih oleh client
-        $tasks = Task::with('project')->where('worker_id', Auth::id())->where('is_selected', true)->latest()->get();
+        // Hanya tampilkan pekerjaan di mana worker telah secara resmi dipilih oleh client dan statusnya belum completed
+        $tasks = Task::with('project')
+            ->where('worker_id', Auth::id())
+            ->where('is_selected', true)
+            ->where('status', '!=', 'completed')
+            ->latest()
+            ->get();
 
         return view('worker.tasks.index', compact('tasks'));
+    }
+
+    /**
+     * Display a listing of the completed/paid tasks for the worker.
+     */
+    public function history()
+    {
+        $role = session()->get('active_role', 'client');
+        if ($role !== 'worker') {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        $tasks = Task::with('project.client')
+            ->where('worker_id', Auth::id())
+            ->where('is_selected', true)
+            ->where('status', 'completed')
+            ->latest()
+            ->get();
+
+        return view('worker.tasks.history', compact('tasks'));
     }
 
     /**
@@ -213,4 +237,3 @@ class TaskController extends Controller
         return back()->with('success', 'Terima kasih! Rating dan ulasan berhasil diberikan kepada worker.');
     }
 }
-
