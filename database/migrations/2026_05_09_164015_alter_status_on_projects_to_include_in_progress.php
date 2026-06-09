@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        \Illuminate\Support\Facades\DB::statement("ALTER TABLE projects MODIFY status ENUM('pending', 'active', 'taken', 'in_progress', 'completed', 'rejected') DEFAULT 'pending'");
+        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE projects MODIFY status ENUM('pending', 'active', 'taken', 'in_progress', 'completed', 'rejected') DEFAULT 'pending'");
+        }
     }
 
     /**
@@ -19,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        \Illuminate\Support\Facades\DB::statement("ALTER TABLE projects MODIFY status ENUM('pending', 'active', 'taken', 'completed', 'rejected') DEFAULT 'pending'");
+        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE projects MODIFY status ENUM('pending', 'active', 'taken', 'completed', 'rejected') DEFAULT 'pending'");
+        }
     }
 };

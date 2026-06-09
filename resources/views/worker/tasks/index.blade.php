@@ -52,9 +52,15 @@
                                 {{ intval($daysRemaining) }} hari
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <a href="{{ route('worker.tasks.show', $task->id) }}" class="inline-flex items-center justify-center px-4 py-1.5 border border-[#3ba8c9] text-[#3ba8c9] hover:bg-[#f0f9fb] rounded-md text-sm font-medium bg-white transition-colors">
-                                    Upload
-                                </a>
+                                @if(!$task->project->client || !$task->project->client->is_active)
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                        Client Nonaktif
+                                    </span>
+                                @else
+                                    <a href="{{ route('worker.tasks.show', $task->id) }}" class="inline-flex items-center justify-center px-4 py-1.5 border border-[#3ba8c9] text-[#3ba8c9] hover:bg-[#f0f9fb] rounded-md text-sm font-medium bg-white transition-colors">
+                                        Upload
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @empty

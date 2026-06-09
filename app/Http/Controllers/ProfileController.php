@@ -10,6 +10,19 @@ class ProfileController extends Controller
 {
     public function edit()
     {
+        if (!Auth::user()->is_active) {
+            return redirect()->route('dashboard')->with('error', 'Akun Anda telah dinonaktifkan karena terdeteksi adanya pelanggaran.');
+        }
+
+        $user = Auth::user();
+
+        // Query semua task di mana user ini berperan sebagai worker dan sudah diberi rating
+        $receivedRatings = \App\Models\Task::with(['project.client'])
+            ->where('worker_id', $user->id)
+            ->whereNotNull('rating')
+            ->latest()
+            ->get();
+
         return view('profile', [
             'user' => Auth::user(),
         ]);
@@ -17,6 +30,10 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        if (!Auth::user()->is_active) {
+            return redirect()->route('dashboard')->with('error', 'Akun Anda telah dinonaktifkan karena terdeteksi adanya pelanggaran.');
+        }
+
         $user = Auth::user();
 
         $request->validate([

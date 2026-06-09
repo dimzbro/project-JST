@@ -113,13 +113,22 @@
                         Hubungi Client
                     </a>
                 @else
-                    <button type="button" onclick="document.getElementById('confirmModal').style.display='flex'" class="bg-[#5bc0de] hover:bg-[#4eb0ce] text-white font-bold shadow transition-colors" style="width: 100%; padding: 12px 16px; border-radius: 12px; font-size: 14px; border: none; cursor: pointer; margin-bottom: 8px;">
-                        Ambil Pekerjaan
-                    </button>
-                    
-                    <p class="text-gray-400" style="text-align: center; font-size: 10px; line-height: 1.3; padding: 0 8px;">
-                        Dengan menekan tombol di atas, Anda menyetujui syarat & ketentuan layanan
-                    </p>
+                    @if(!Auth::user()->is_active)
+                        <button type="button" disabled class="bg-gray-300 text-gray-500 cursor-not-allowed font-bold" style="width: 100%; padding: 12px 16px; border-radius: 12px; font-size: 14px; border: none; margin-bottom: 8px;">
+                            Akun Dinonaktifkan
+                        </button>
+                        <p class="text-red-500 text-center text-xs font-semibold px-2 mb-2">
+                            Akun Anda sedang dinonaktifkan. Anda tidak dapat mengambil pekerjaan.
+                        </p>
+                    @else
+                        <button type="button" onclick="document.getElementById('confirmModal').style.display='flex'" class="bg-[#5bc0de] hover:bg-[#4eb0ce] text-white font-bold shadow transition-colors" style="width: 100%; padding: 12px 16px; border-radius: 12px; font-size: 14px; border: none; cursor: pointer; margin-bottom: 8px;">
+                            Ambil Pekerjaan
+                        </button>
+                        
+                        <p class="text-gray-400" style="text-align: center; font-size: 10px; line-height: 1.3; padding: 0 8px;">
+                            Dengan menekan tombol di atas, Anda menyetujui syarat & ketentuan layanan
+                        </p>
+                    @endif
                 @endif
 
             </div>

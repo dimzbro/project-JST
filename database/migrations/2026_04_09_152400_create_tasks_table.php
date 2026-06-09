@@ -15,7 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->foreignId('worker_id')->constrained('users')->onDelete('cascade');
-            $table->enum('status', ['in_progress', 'completed'])->default('in_progress');
+            if (\Illuminate\Support\Facades\DB::getDriverName() === 'sqlite') {
+                $table->string('status')->default('in_progress');
+            } else {
+                $table->enum('status', ['in_progress', 'completed'])->default('in_progress');
+            }
             $table->timestamps();
         });
     }

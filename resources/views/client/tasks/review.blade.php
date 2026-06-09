@@ -488,15 +488,6 @@
             }
 
             starBtns.forEach(btn => {
-                btn.addEventListener('mouseover', function () {
-                    const hoverValue = parseInt(this.getAttribute('data-value'));
-                    highlightStars(hoverValue);
-                });
-
-                btn.addEventListener('mouseout', function () {
-                    highlightStars(currentRating);
-                });
-
                 btn.addEventListener('click', function () {
                     currentRating = parseInt(this.getAttribute('data-value'));
                     selectedRatingValue.value = currentRating;

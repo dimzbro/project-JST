@@ -106,6 +106,25 @@
             </div>
         </div>
     @else
+        <!-- Deactivated Alert Banner -->
+        @if(!Auth::user()->is_active)
+            <div class="mb-6 p-4 text-red-700 bg-red-50 rounded-lg border border-red-200 flex items-center text-sm shadow-sm">
+                <svg class="w-5 h-5 mr-2 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <span class="font-semibold">Akun Anda telah dinonaktifkan karena terdeteksi adanya pelanggaran.</span>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="mb-6 p-4 text-red-700 bg-red-50 rounded-lg border border-red-200 flex items-center text-sm shadow-sm">
+                <svg class="w-5 h-5 mr-2 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <span class="font-semibold">{{ session('error') }}</span>
+            </div>
+        @endif
+
         <!-- Welcome Banner -->
         <div class="mb-8 w-full bg-[#007bff] rounded-lg p-6 text-white shadow-sm">
             <h2 class="text-2xl font-bold mb-1">Selamat Datang {{ $user->first_name }} {{ $user->last_name }}!</h2>
@@ -155,16 +174,22 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             <!-- Pasang Lowongan Baru Card -->
-            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col {{ $role === 'worker' ? 'opacity-50 pointer-events-none' : '' }}">
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col {{ ($role === 'worker' || !Auth::user()->is_active) ? 'opacity-50 pointer-events-none' : '' }}">
                 <div class="flex items-center mb-3 text-gray-800">
                     <h3 class="text-lg font-bold mr-2">Pasang Lowongan Baru</h3>
                     <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <p class="text-sm text-gray-500 mb-6 flex-1">Butuh bantuan untuk menyelesaikan proyek? Posting lowongan Anda sekarang dan temukan tenaga ahli terbaik.</p>
                 @if($role === 'client')
-                    <a href="{{ route('projects.create') }}" class="w-full text-center py-2.5 px-4 rounded-md text-sm font-medium transition-colors bg-[#5bc0de] text-white hover:bg-blue-400 block">
-                        Pasang Sekarang
-                    </a>
+                    @if(!Auth::user()->is_active)
+                        <button disabled class="w-full text-center py-2.5 px-4 rounded-md text-sm font-medium bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed">
+                            Pasang Sekarang (Akun Dinonaktifkan)
+                        </button>
+                    @else
+                        <a href="{{ route('projects.create') }}" class="w-full text-center py-2.5 px-4 rounded-md text-sm font-medium transition-colors bg-[#5bc0de] text-white hover:bg-blue-400 block">
+                            Pasang Sekarang
+                        </a>
+                    @endif
                 @else
                     <button class="w-full py-2.5 px-4 rounded-md text-sm font-medium transition-colors bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed">
                         Pasang Sekarang
@@ -173,16 +198,22 @@
             </div>
 
             <!-- Cari Lowongan Kerja Card -->
-            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col {{ $role === 'client' ? 'opacity-50 pointer-events-none' : '' }}">
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col {{ ($role === 'client' || !Auth::user()->is_active) ? 'opacity-50 pointer-events-none' : '' }}">
                 <div class="flex items-center mb-3 text-gray-800">
                     <h3 class="text-lg font-bold mr-2">Cari Lowongan Kerja</h3>
                     <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
                 <p class="text-sm text-gray-500 mb-6 flex-1">Butuh bantuan untuk menyelesaikan proyek? Posting lowongan Anda sekarang dan temukan tenaga ahli terbaik.</p>
                 @if($role === 'worker')
-                    <a href="{{ route('jobs.index') }}" class="w-full text-center py-2.5 px-4 rounded-md text-sm font-medium transition-colors border-2 bg-white border-blue-400 text-blue-500 hover:bg-blue-50 block">
-                        Cari Lowongan
-                    </a>
+                    @if(!Auth::user()->is_active)
+                        <button disabled class="w-full text-center py-2.5 px-4 rounded-md text-sm font-medium bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed">
+                            Cari Lowongan (Akun Dinonaktifkan)
+                        </button>
+                    @else
+                        <a href="{{ route('jobs.index') }}" class="w-full text-center py-2.5 px-4 rounded-md text-sm font-medium transition-colors border-2 bg-white border-blue-400 text-blue-500 hover:bg-blue-50 block">
+                            Cari Lowongan
+                        </a>
+                    @endif
                 @else
                     <button class="w-full py-2.5 px-4 rounded-md text-sm font-medium transition-colors border-2 bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed">
                         Cari Lowongan

@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'is_active',
         'about_me',
         'skills',
         'profile_photo_path',
@@ -42,6 +43,38 @@ class User extends Authenticatable
         'remember_token',
     ];
     
+    public function getRoleDisplayNameAttribute()
+    {
+        if ($this->is_admin) {
+            return 'Admin';
+        }
+        if (\App\Models\Task::where('worker_id', $this->id)->exists()) {
+            return 'Worker';
+        }
+        if (\App\Models\Project::where('client_id', $this->id)->exists()) {
+            return 'Client';
+        }
+        return $this->skills ? 'Worker' : 'Client';
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class, 'client_id');
+    }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'worker_id');
+    }
+
+    public function getRatingAttribute()
+    {
+        if ($this->rating_count == 0) {
+            return null;
+        }
+        return (float) ($this->rating_points / $this->rating_count);
+    }
+
     public function getAverageRatingAttribute()
     {
         if ($this->rating_count == 0) {
@@ -70,6 +103,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
+            'is_admin' => 'boolean',
         ];
     }
 }

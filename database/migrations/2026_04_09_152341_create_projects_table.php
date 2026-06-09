@@ -16,7 +16,11 @@ return new class extends Migration
             $table->foreignId('client_id')->constrained('users')->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('status', ['active', 'taken', 'completed'])->default('active');
+            if (\Illuminate\Support\Facades\DB::getDriverName() === 'sqlite') {
+                $table->string('status')->default('active');
+            } else {
+                $table->enum('status', ['active', 'taken', 'completed'])->default('active');
+            }
             $table->timestamps();
         });
     }

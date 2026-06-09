@@ -21,6 +21,10 @@ class ProjectController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya client yang bisa memposting pekerjaan.');
         }
 
+        if (!Auth::user()->is_active) {
+            return redirect()->route('dashboard')->with('error', 'Akun Anda telah dinonaktifkan karena terdeteksi adanya pelanggaran.');
+        }
+
         return view('projects.create');
     }
 
@@ -33,6 +37,10 @@ class ProjectController extends Controller
         $role = session()->get('active_role', 'client');
         if ($role !== 'client') {
             return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya client yang bisa memposting pekerjaan.');
+        }
+
+        if (!Auth::user()->is_active) {
+            return redirect()->route('dashboard')->with('error', 'Akun Anda telah dinonaktifkan karena terdeteksi adanya pelanggaran.');
         }
 
         $validated = $request->validate([
@@ -68,8 +76,14 @@ class ProjectController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya worker yang bisa mencari pekerjaan.');
         }
 
+        if (!Auth::user()->is_active) {
+            return redirect()->route('dashboard')->with('error', 'Akun Anda telah dinonaktifkan karena terdeteksi adanya pelanggaran.');
+        }
+
         $workerId = Auth::id();
-        $query = Project::with(['client', 'tasks' => function($q) use ($workerId) {
+        $query = Project::whereHas('client', function($q) {
+            $q->where('is_active', true);
+        })->with(['client', 'tasks' => function($q) use ($workerId) {
             $q->where('worker_id', $workerId);
         }])->whereIn('status', ['active', 'taken']);
 
@@ -91,7 +105,9 @@ class ProjectController extends Controller
         $projects = $query->latest()->get();
         
         // Get all unique categories from visible projects
-        $categories = Project::whereIn('status', ['active', 'taken'])
+        $categories = Project::whereHas('client', function($q) {
+            $q->where('is_active', true);
+        })->whereIn('status', ['active', 'taken'])
             ->whereNotNull('category')
             ->where('category', '!=', '')
             ->distinct()
@@ -111,15 +127,17 @@ class ProjectController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya worker yang bisa melihat detail pekerjaan.');
         }
 
+        $project->load('client');
+        if (!$project->client || !$project->client->is_active) {
+            return redirect()->route('jobs.index')->with('error', 'Pekerjaan ini sudah tidak tersedia.');
+        }
+
         if (!in_array($project->status, ['active', 'taken', 'in_progress', 'completed'])) {
             return redirect()->route('jobs.index')->with('error', 'Pekerjaan ini sudah tidak tersedia.');
         }
 
         // Cari tahu apakah worker sudah mengambil job ini (untuk mengubah tombol)
         $task = $project->tasks()->where('worker_id', Auth::id())->first();
-
-        // Load client details
-        $project->load('client');
 
         return view('projects.job-detail', compact('project', 'task'));
     }
@@ -133,6 +151,16 @@ class ProjectController extends Controller
         $role = session()->get('active_role', 'client');
         if ($role !== 'worker') {
             return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya worker yang bisa mengambil pekerjaan.');
+        }
+
+        // Check if the user is active
+        if (!Auth::user()->is_active) {
+            return redirect()->back()->with('error', 'Akun Anda sedang dinonaktifkan. Anda tidak dapat mengambil pekerjaan.');
+        }
+
+        $project->load('client');
+        if (!$project->client || !$project->client->is_active) {
+            return redirect()->route('jobs.index')->with('error', 'Pekerjaan ini sudah tidak tersedia.');
         }
 
         if (!in_array($project->status, ['active', 'taken', 'in_progress', 'completed'])) {
@@ -313,10 +341,15 @@ class ProjectController extends Controller
     public function selectWorker(Task $task)
     {
         $role = session()->get('active_role', 'client');
-        $task->load('project');
+        $task->load(['project', 'worker']);
         
         if ($role !== 'client' || $task->project->client_id !== Auth::id()) {
             return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        // Check if the selected worker is active
+        if (!$task->worker || !$task->worker->is_active) {
+            return redirect()->back()->with('error', 'Pekerja ini sedang dinonaktifkan.');
         }
 
         // Update project status to in_progress

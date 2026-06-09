@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        \Illuminate\Support\Facades\DB::statement("ALTER TABLE tasks MODIFY status ENUM('in_progress', 'in_review', 'revision_requested', 'completed') DEFAULT 'in_progress'");
+        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE tasks MODIFY status ENUM('in_progress', 'in_review', 'revision_requested', 'completed') DEFAULT 'in_progress'");
+        }
     }
 
     /**
@@ -19,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        \Illuminate\Support\Facades\DB::statement("ALTER TABLE tasks MODIFY status ENUM('in_progress', 'completed') DEFAULT 'in_progress'");
+        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE tasks MODIFY status ENUM('in_progress', 'completed') DEFAULT 'in_progress'");
+        }
     }
 };

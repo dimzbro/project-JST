@@ -20,7 +20,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
@@ -56,6 +56,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/verifikasi', [App\Http\Controllers\AdminVerificationController::class, 'index'])->name('admin.verification.index');
     Route::get('/admin/verifikasi/{project}', [App\Http\Controllers\AdminVerificationController::class, 'show'])->name('admin.verification.show');
     Route::post('/admin/verifikasi/{project}', [App\Http\Controllers\AdminVerificationController::class, 'verify'])->name('admin.verification.verify');
+
+    Route::get('/admin/pengguna', [\App\Http\Controllers\AdminUserController::class, 'index'])->name('admin.users.index');
+    Route::post('/admin/pengguna/{user}/toggle', [\App\Http\Controllers\AdminUserController::class, 'toggleStatus'])->name('admin.users.toggle');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {
-            \Illuminate\Support\Facades\DB::statement("ALTER TABLE projects MODIFY status ENUM('pending', 'active', 'taken', 'completed', 'rejected') DEFAULT 'pending'");
-        }
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('is_active')->default(true)->after('is_admin');
+        });
     }
 
     /**
@@ -21,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('is_active');
+        });
     }
 };

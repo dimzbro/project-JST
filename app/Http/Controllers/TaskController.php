@@ -22,6 +22,14 @@ class TaskController extends Controller
         // Hanya tampilkan pekerjaan di mana worker telah secara resmi dipilih oleh client
         $tasks = Task::with('project')->where('worker_id', Auth::id())->where('is_selected', true)->latest()->get();
 
+        // Hanya tampilkan pekerjaan di mana worker telah secara resmi dipilih oleh client dan statusnya belum completed
+        $tasks = Task::with('project.client')
+            ->where('worker_id', Auth::id())
+            ->where('is_selected', true)
+            ->where('status', '!=', 'completed')
+            ->latest()
+            ->get();
+
         return view('worker.tasks.index', compact('tasks'));
     }
 
@@ -51,6 +59,16 @@ class TaskController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
         }
 
+        // Check if the user is active
+        if (!Auth::user()->is_active) {
+            return redirect()->back()->with('error', 'Akun Anda sedang dinonaktifkan. Anda tidak dapat mengunggah hasil pekerjaan.');
+        }
+
+        $task->load('project.client');
+        if (!$task->project->client || !$task->project->client->is_active) {
+            return redirect()->route('worker.tasks.show', $task->id)->with('error', 'Klien pekerjaan ini sedang dinonaktifkan. Anda tidak dapat mengunggah hasil pekerjaan saat ini.');
+        }
+
         return view('worker.tasks.upload', compact('task'));
     }
 
@@ -62,6 +80,16 @@ class TaskController extends Controller
         $role = session()->get('active_role', 'client');
         if ($role !== 'worker' || $task->worker_id !== Auth::id()) {
             return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        // Check if the user is active
+        if (!Auth::user()->is_active) {
+            return redirect()->back()->with('error', 'Akun Anda sedang dinonaktifkan. Anda tidak dapat mengunggah hasil pekerjaan.');
+        }
+
+        $task->load('project.client');
+        if (!$task->project->client || !$task->project->client->is_active) {
+            return redirect()->route('worker.tasks.show', $task->id)->with('error', 'Klien pekerjaan ini sedang dinonaktifkan. Anda tidak dapat mengunggah hasil pekerjaan saat ini.');
         }
 
         $request->validate([

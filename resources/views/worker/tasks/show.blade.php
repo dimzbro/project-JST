@@ -17,6 +17,15 @@
             {{ session('error') }}
         </div>
     @endif
+
+    @if(!$task->project->client || !$task->project->client->is_active)
+        <div class="mb-4 p-3 text-red-700 bg-red-100 rounded-lg border border-red-200 text-sm font-semibold flex items-center shadow-sm">
+            <svg class="w-5 h-5 mr-2 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <span>Perhatian: Akun Client pekerjaan ini sedang dinonaktifkan. Anda tidak dapat melakukan interaksi atau mengirim hasil pekerjaan saat ini.</span>
+        </div>
+    @endif
     
     <div style="display: flex; gap: 24px; align-items: flex-start;">
         <!-- Left Column -->
@@ -113,9 +122,25 @@
             </a>
             
             @if($task->status === 'in_progress' || $task->status === 'revision_requested')
-                <a href="{{ route('worker.tasks.upload', $task->id) }}" class="w-full flex items-center justify-center bg-[#5bc0de] hover:bg-[#4eb0ce] text-white font-medium py-3 px-4 rounded-lg shadow-sm transition-colors text-sm">
-                    Unggah Hasil
-                </a>
+                @if(!Auth::user()->is_active)
+                    <button disabled class="w-full flex items-center justify-center text-gray-500 font-medium py-3 px-4 rounded-lg shadow-sm cursor-not-allowed text-sm bg-gray-200">
+                        Akun Dinonaktifkan
+                    </button>
+                    <p class="text-red-500 text-center text-xs font-semibold px-2 mt-2">
+                        Akun Anda sedang dinonaktifkan. Anda tidak dapat mengunggah hasil pekerjaan.
+                    </p>
+                @elseif(!$task->project->client || !$task->project->client->is_active)
+                    <button disabled class="w-full flex items-center justify-center text-gray-500 font-medium py-3 px-4 rounded-lg shadow-sm cursor-not-allowed text-sm bg-gray-200">
+                        Unggah Hasil (Client Nonaktif)
+                    </button>
+                    <p class="text-red-500 text-center text-xs font-semibold px-2 mt-2">
+                        Akun Client sedang dinonaktifkan. Anda tidak dapat mengunggah hasil pekerjaan.
+                    </p>
+                @else
+                    <a href="{{ route('worker.tasks.upload', $task->id) }}" class="w-full flex items-center justify-center bg-[#5bc0de] hover:bg-[#4eb0ce] text-white font-medium py-3 px-4 rounded-lg shadow-sm transition-colors text-sm">
+                        Unggah Hasil
+                    </a>
+                @endif
             @elseif($task->status === 'in_review')
                 <button disabled class="w-full flex items-center justify-center text-white font-medium py-3 px-4 rounded-lg shadow-sm cursor-not-allowed text-sm" style="background-color: #9ca3af;">
                     Menunggu Persetujuan Client
